@@ -9,6 +9,7 @@ import json
 import math
 
 item_file_path = 'G:/eft 13-5-1/EFT/Aki_Data/Server/database/templates/items.json'
+# item_file_path = 'G:/eft 13-5-1/EFT/Aki_Data/Server/database/templates/items.bak.json'
 item_file = open(item_file_path, 'r', encoding='utf8')
 item_data = json.loads(item_file.read())
 
@@ -26,10 +27,10 @@ mag_parent = '5448bc234bdc2d3c308b4569'
 medical_parent = '5448f39d4bdc2d0a728b4568'
 ammo_parent = '5485a8684bdc2da71d8b4567'
 
-# grizzly, AFAK, Car, IFAK, AI-2, Salewa, sanitar ifak
-med_kit_ids = ['590c657e86f77412b013051d', '60098ad7c2240c0fe85c570a', \
-               '590c661e86f7741e566b646a', '590c678286f77426c9660122', \
-               '5755356824597772cb798962', '544fb45d4bdc2dee738b4568', \
+# car, Salewa, grizzly, IFAK, AI-2, AFAK, sanitar ifak
+med_kit_ids = ['590c661e86f7741e566b646a', '544fb45d4bdc2dee738b4568',
+               '590c657e86f77412b013051d', '5755356824597772cb798962',
+               '590c678286f77426c9660122', '60098ad7c2240c0fe85c570a',
                '5e99711486f7744bfc4af328']
 
 armor_keys = []
@@ -55,11 +56,11 @@ for key in item_data.keys():
     
     # mags
     if item_data[key]['_parent'] == mag_parent:
-        ammo_keys.append(key)
+       mag_keys.append(key)
         
     # ammo
     if item_data[key]['_parent'] == ammo_parent:
-        mag_keys.append(key)
+        ammo_keys.append(key)
 
 # all items to mod durability     
 mod_keys = armor_keys + rig_keys + helmet_keys + armored_equipment_keys
@@ -121,14 +122,22 @@ for key in mag_keys:
 # print(exp_decay(value_1, 0.1, 5))
 # print(exp_decay(value_100, 0.1, 5))
 
-# probably easier to just set the stats 
-# manually per item since there are only 5
-# order of the list
+# health items mods
 def mod_med_item(item_id, max_uses, hp_recovery_rate, stim_buff=''):
     item_data[item_id]['_props']['MaxHpResource'] = max_uses
-    item_data[key]['_props']['hpResourceRate'] = hp_recovery_rate
-    item_data[key]['_props']['StimulatorBuffs'] = stim_buff
+    item_data[item_id]['_props']['hpResourceRate'] = hp_recovery_rate
+    item_data[item_id]['_props']['StimulatorBuffs'] = stim_buff
 
+# car, Salewa, grizzly, AI-2, IFAK, AFAK, sanitar ifak
+mod_med_item(med_kit_ids[0], 20, 0, 'BuffsCarKit')
+mod_med_item(med_kit_ids[1], 30, 0, 'BuffsSalewa')
+mod_med_item(med_kit_ids[2], 60, 0, 'BuffsGrizzly')
+mod_med_item(med_kit_ids[3], 500, 125)
+mod_med_item(med_kit_ids[4], 1250, 175)
+mod_med_item(med_kit_ids[5], 2000, 225)
+mod_med_item(med_kit_ids[6], 2000, 225)
+
+# item_data[med_kit_ids[3]]['_props']
 
 def add_med_buff(buff_name, duration, heal_amt):
     global_data['config']['Health']['Effects']['Stimulator']['Buffs'][buff_name] = [{
@@ -140,15 +149,25 @@ def add_med_buff(buff_name, duration, heal_amt):
                                                                                         "SkillName": "",
                                                                                         "Value": heal_amt
                                                                                     }] 
-add_med_buff('BuffsGrizzly', 600, 20)
-add_med_buff('BuffsSalewa', 300, 10)
+
 add_med_buff('BuffsCarKit', 300, 5)
-################
+add_med_buff('BuffsSalewa', 300, 10)
+add_med_buff('BuffsGrizzly', 600, 20)
 
 # ammo adjusts
 
-"StackMaxSize": 50
+# distinct_ammo = []
+# for key in ammo_keys:
+#     distinct_ammo.append(item_data[key]['_props']['StackMaxSize'])
 
+# distinct_ammo = set(distinct_ammo)
+
+for key in ammo_keys:
+    if item_data[key]['_props']['StackMaxSize'] in [15, 20]:
+        item_data[key]['_props']['StackMaxSize'] = 100
+    if item_data[key]['_props']['StackMaxSize'] in [30, 40, 50, 70]:
+        item_data[key]['_props']['StackMaxSize'] = 300
+        
 ##########
 # save and close files
 ##########
