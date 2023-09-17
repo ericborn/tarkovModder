@@ -6,18 +6,28 @@ Created on Fri Sep 15 17:51:56 2023
 """
 
 import json
-import math
 
-item_file_path = 'G:/eft 13-5-1/EFT/Aki_Data/Server/database/templates/items.json'
-# item_file_path = 'G:/eft 13-5-1/EFT/Aki_Data/Server/database/templates/items.bak.json'
-item_file = open(item_file_path, 'r', encoding='utf8')
-item_data = json.loads(item_file.read())
+def load_json(file_path):
+    item_file = open(file_path, 'r', encoding='utf8')
+    item_data = json.loads(item_file.read())
+    item_file.close()
+    return item_data
 
-global_file_path = 'G:/eft 13-5-1/EFT/Aki_Data/Server/database/globals.json'
-global_file = open(global_file_path, 'r', encoding='utf8')
-global_data = json.loads(global_file.read())
+global_path = 'G:/eft 13-5-1/EFT/Aki_Data/Server/database/globals.json'
+item_path = 'G:/eft 13-5-1/EFT/Aki_Data/Server/database/templates/items.json'
+bear_bot_path = 'G:/eft 13-5-1/EFT/Aki_Data/Server/database/bots/types/bear.json'
+usec_bot_path = 'G:/eft 13-5-1/EFT/Aki_Data/Server/database/bots/types/usec.json'
+hideout_areas_path = 'G:/eft 13-5-1/EFT/Aki_Data/Server/database/hideout/areas.json'
+hideout_settings_path = 'G:/eft 13-5-1/EFT/Aki_Data/Server/database/hideout/settings.json'
+hideout_production_path = 'G:/eft 13-5-1/EFT/Aki_Data/Server/database/hideout/production.json'
 
-durability_adjustment = 3
+item_data = load_json(item_path)
+global_data = load_json(global_path)
+bear_data = load_json(bear_bot_path)
+usec_data = load_json(usec_bot_path)
+hideout_areas_data = load_json(hideout_areas_path)
+hideout_settings_data = load_json(hideout_settings_path)
+hideout_production_data = load_json(hideout_production_path)
 
 body_armor_parent = '5448e54d4bdc2dcc718b4568'
 rig_parent = '5448e5284bdc2dcb718b4567'
@@ -39,8 +49,10 @@ helmet_keys = []
 armored_equipment_keys = []
 mag_keys = []
 ammo_keys = []
+all_keys = list(item_data.keys())
 
 for key in item_data.keys():
+    
     # armor
     if item_data[key]['_parent'] == body_armor_parent:
         armor_keys.append(key)
@@ -66,6 +78,7 @@ for key in item_data.keys():
 mod_keys = armor_keys + rig_keys + helmet_keys + armored_equipment_keys
 
 # multiply all durabilities
+durability_adjustment = 3
 for key in mod_keys:
     try:
         item_data[key]['_props']['Durability'] *= durability_adjustment 
@@ -85,7 +98,9 @@ for key in mod_keys:
 # for key in original_values:
 #     item_data[key]['_props']['LoadUnloadModifier'] = original_values[key]
 
-
+###
+# mag reloading changes
+###
 # fixed range adjustments
 # negative values increase loading speed
 # need to figure out the formula for diminishing returns
@@ -101,28 +116,51 @@ for key in mag_keys:
     except:
         pass
 
-# TODO
-# isn't working how I want it to, too extreme at 1 and not extreme
-# enough at 100, also needs to set modifier as a negative number
-# function for exponential decay to decrease the gain
-# as the base modifier increases
-# a = starting value
-# r = decay rate
-# x = total operations
-# def exp_decay(a, r, x):
-#     f = a*(1-r)**x
-#     return(f)
+# cut base load/unload times in half
+# default 0.85 and 0.3
+global_data['config']['BaseLoadTime'] *= 0.5
+global_data['config']['BaseUnloadTime'] *= 0.5
 
-# starting_amount = 0.75
-# decay_rate = 0.1
+###
+# stamina/inertia changes
+###
 
-# print(exp_decay(0.75, 0.1, 1)*100)
-# print(exp_decay(1, 0.1, value_100)*100)
+# shouldn't need adjusting due to changes to all item weight
+# global_data['config']['Stamina']['BaseOverweightLimits']['x']
+# global_data['config']['Stamina']['BaseOverweightLimits']['y']
+# global_data['config']['Stamina']['BaseOverweightLimits']['z']
 
-# print(exp_decay(value_1, 0.1, 5))
-# print(exp_decay(value_100, 0.1, 5))
+# default
+# {'x': 0.17, 'y': 0.7, 'z': 0}
+global_data['config']['Stamina']['CrouchConsumption']['x'] = 0.1
+global_data['config']['Stamina']['CrouchConsumption']['y'] = 0.3
 
+global_data['config']['Stamina']['FallDamageMultiplier'] *= 0.25
+
+# default
+# {'x': -3, 'y': -2, 'z': 0}
+global_data['config']['Stamina']['OverweightConsumptionByPose']['x'] *= 0.5
+global_data['config']['Stamina']['OverweightConsumptionByPose']['y'] *= 0.5
+
+global_data['config']['Stamina']['ProneConsumption'] *= 0.5
+
+global_data['config']['Stamina']['SitToStandConsumption'] *= 0.5
+global_data['config']['Stamina']['SprintDrainRate'] *= 0.5
+global_data['config']['Stamina']['SprintOverweightLimits']['x'] *= 1.25
+global_data['config']['Stamina']['SprintOverweightLimits']['y'] *= 1.25
+global_data['config']['Stamina']['StandupConsumption']['x'] *= 0.5
+global_data['config']['Stamina']['StandupConsumption']['y'] *= 0.5
+
+global_data['config']['Inertia']['WalkInertia']['x'] *= 0.1
+global_data['config']['Inertia']['WalkInertia']['y'] *= 0.1
+
+# {'x': 0, 'y': 65, 'z': 0.5}
+global_data['config']['Inertia']['InertiaLimits']['y'] = 0.1
+global_data['config']['Inertia']['InertiaLimits']['z'] = 0.1
+
+###
 # health items mods
+###
 def mod_med_item(item_id, max_uses, hp_recovery_rate, stim_buff=''):
     item_data[item_id]['_props']['MaxHpResource'] = max_uses
     item_data[item_id]['_props']['hpResourceRate'] = hp_recovery_rate
@@ -154,8 +192,9 @@ add_med_buff('BuffsCarKit', 300, 5)
 add_med_buff('BuffsSalewa', 300, 10)
 add_med_buff('BuffsGrizzly', 600, 20)
 
+###
 # ammo adjusts
-
+###
 # distinct_ammo = []
 # for key in ammo_keys:
 #     distinct_ammo.append(item_data[key]['_props']['StackMaxSize'])
@@ -167,19 +206,145 @@ for key in ammo_keys:
         item_data[key]['_props']['StackMaxSize'] = 100
     if item_data[key]['_props']['StackMaxSize'] in [30, 40, 50, 70]:
         item_data[key]['_props']['StackMaxSize'] = 300
-        
+
+# Adjust weight of all items
+weight_modifier = 0.35
+for key in all_keys:
+    try:
+        item_data[key]['_props']['Weight'] *= weight_modifier
+    except:
+        pass
+####
+# hideout
+####
+# smaller is better
+# 'generatorFuelFlowRate': 0.001319444444444,
+# 'airFilterUnitFlowRate': 0.004722222222222,
+# larger is better
+# 'gpuBoostRate': 0.041225
+hideout_settings_data['generatorFuelFlowRate'] *= 0.25
+hideout_settings_data['airFilterUnitFlowRate'] *= 0.25
+hideout_settings_data['gpuBoostRate'] = 0.09
+
+# set construction of any hideout areas to 1
+for area in hideout_areas_data:
+    for key in area['stages'].keys():
+        area['stages'][key]['constructionTime'] = 1
+
+# set production of all items to 1 
+for items in hideout_production_data:
+    items['productionTime'] = 1
+
+####
+# bot name changes
+####
+
+bear_name_list = ["15NUNDR","1STLINE","1V1IRL","2RETSGUY","360NSCP","5FNGRS",
+                  "6969DKS","90S E","AGATHA","ALINWRE","ALXFACE","ANOOSE1",
+                  "ARYNBNZ","ASS2MTH","ASSPLAY","AZNPSSY","BABYDCK","BALDRIK",
+                  "BALHAIR","BALLPIT","BALLPLY","BEATOFF","BIRDUP","BLCKFCE",
+                  "BLDWALL","BLKFMTR","BLL5GTS","BLPITSPK","BLWDUDES","BOITKLR",
+                  "BOYBTTR","BOYLOVE","BRD1ST","BRNJWS","BRNTJEW","BRSTMLK",
+                  "BUTTCHG","BYOCV19","CAMPR","CARADIN","CHNAVRS","CLPTRP",
+                  "COCKSOX","COKENRG","COKERNG","COKLIFE","COKNWAY","COSBYD",
+                  "CUMDUMP","CUMGUZL","CUMONME","CV19FUN","DADFCKR","DCKBERD",
+                  "DCKCHCK","DCKHOLE","DCKNAIR","DCKPLS","DEZNUTZ","DIDLER",
+                  "DIKCHSE","DOALINE","DOBABYS","DRAGQUN","DRTYVAG","DWNSHFT",
+                  "EATSEED","EGLEYE6","EMEPAR","F4GSLYR","FATLINE","FCKDADS",
+                  "FCKLKY","FCKTRMP","FLPYHAT","FNCEJMP","FNGRBST","FNGRME",
+                  "FNGTRP","FTFJ247","FTFJ314","FTFJ365","GAGER69","GASCHBR",
+                  "GAY4GOD","GAY4PAY","GAYFUEL","GITIKLD","GNKFERY","GOHMMEX",
+                  "GOOFBLS","GOTKIDS","GOTPPR","GOTRAIL","GOTTOES","GRBPSSY",
+                  "GRINDER","GRLAFNGR","GTDIDLD","GTRKDM8","GTTKLD","GTTKLED",
+                  "H8BLCKS","HARDAF","HARDDIK","HEILHLR","HIPPYBS","HOGFEST",
+                  "HOGFTHR","HOGMSTR","HRAMBE","HVCNDY","HWIBCOL","I(HEART)COKE",
+                  "I(HEART)DRGS","I(HEART)ISIS","I(HEART)SLVS","IDOBLOW",
+                  "IDOGUYS","IDOKIDS","IFKSLNTS","IH8GAYS","ISQUIRT","JELORPE",
+                  "JEWBTCH","JEWSTAR","JEWTITS","JPJESUS","JSTREKX","KIDTKLR",
+                  "KINDR","KLANKAR","KLANVAN","KUMLORD","LADYBOY","LINESFJ",
+                  "LOTLZRD","LSD4ME","LTITHPN","MANLOVE","MDMABCH","MEATSPN",
+                  "MSLMBAN","MSTRACE","MTHDOUT","NEDMEAT","NEEDRPE","NGGRDCK",
+                  "NI69GR","NIGAFAG","NMBRSEC","NOGIRLS","NOMASKS","NOWIHRD",
+                  "NZISTBL","OHCHUM","OLDPEDO","PAULWKR","PEPCOCK","PEWPEWW",
+                  "PLANDMC","PLLCSBY","PNTMSTR","POPPERS","POUNDME","PSHROPE",
+                  "PUTNCRTN","PWRBFST","PWRBTTM","RAILME","RCKGRME","RDNBIDN",
+                  "SANDNGR","SANSBSH","SCKDADS","SHOOTER","SHTYBDY","SLKDADY",
+                  "SNDBULL","SNDITM8","SPUNKME","STEPDON","STMPYRD","STROKIT",
+                  "SWALWS","SWTYBLS","TBRODY","TEARBAG","TENSILE","TKLMSTR",
+                  "TNKTNK","TOTS4ME","TRAPBAR","TRE50TY","TREKLLR","TRIGGRD",
+                  "TROLL","TYRODND","UMADBRO","UNCLJON","USERVE","UWUTM8",
+                  "VAXCHIP","WALMRT5","WARNI","WHTCLAW","WHTPWR","WHTRGHT",
+                  "WIZZBNG","WOOLLEG"]
+
+usec_name_list = ["12YoSoaking","2Dudes1Butt","2DudesCuddling","2DudesSoaking",
+                  "2YOAbortions","AbdulPussigap","Aborted12YO","AbortedLimbs",
+                  "AbortYourTeen","aCowboysHeavyLoad","AllBeefWienerThief",
+                  "AmeerAnaland","AnalAlpha","AnalAndy","AnalOmega",
+                  "AngelHairMilfs","AssAssassin","assclampsncables",
+                  "AuschwitzLarry","BabyHooker","BabyOilSprinkler","bagofagtits",
+                  "Ballsdeep Invagina","BaronVonNiggerSnatch",
+                  "beefcurtainfacemask","BigTireLips","bloodystoolsample",
+                  "BloodyVag","bonerpills","bonerwind","BoofingBarbarian",
+                  "boofroof","BootyBarbarian","BradyBunchBangBus",
+                  "BrokeBackWetback","buttchopshop","ButterCreamDream",
+                  "ChumBucket","ChumLee","coronatits","Cowboy3Way","CowboyDocking",
+                  "CowboyNutJuice","CowboyNutMilk","CreekWaterSock","DadsBangingDads",
+                  "DankBowels","DavidGobbleDicks","DeepSpaceDominican","deepStink",
+                  "DeerCockWaterSock","DickPickles","DoorDashDildo","DoTheNeedful",
+                  "DunlopLips","DynastyAssMaster","FagetFighter","fagetflounder",
+                  "FatGrannyTits","FatTits","FillMeUpBottomCup","FillMeUpCowboy",
+                  "FillMeWithCowboyLoads","FirestoneLips","FoolOfAGook",
+                  "ForeskinSharPei","GagMeGrandpa","gat5cables","gayassnicknolte",
+                  "gayassovertime","gaymechanics","GoodyearLips","GrampaThickFinger",
+                  "grandpa'sfuckingdad","GrandPappysLappy","GrandpasGigglestick",
+                  "GranpasGospelPipe","GrindrGearGayms","growsomeballs","handoffthegay",
+                  "hotholes","InEachOther","JackFags","KeepinItBeefy","kriskilsonklan",
+                  "LibsKillBabies","LooseCabooseAnoose","LSDSoakTrain","lvl99PwrBottom",
+                  "lvl99RoidBottom","lvl99RoidMage","MammyThickFinger","MaPaMenageATrois",
+                  "MeatMage","MeemawsMeatPocket","MeemawsMeatSock","MeemawsMerkin",
+                  "MeemawsMustache","memawsmeatcliff","MexicansGetAbortions","MichelinLips",
+                  "moistorpedo","MomsDirtyCarpet","MomsIntoGayDads","MotorcycleJesus",
+                  "mrmonoclejesuspeanut","MuffMage","muffslammer69","mustybutts",
+                  "mustysluts","myDADbangsDUDES","NiggerLipsPapa","NoseSprayGirlfriend",
+                  "NotGayWithBros","notmypope","numbersecond","OutHouseHandy",
+                  "PapaTickleStick","PaypalPoon","PipeSquasher","postgamecoitus",
+                  "PR0lap5e","PR0lapse","ProlapsePapa","ProstateBoxer","PunjabBallsdeep",
+                  "QueenSexPot","RamenTilapia","rapejayleno","RapeRogue","Rebups4Rape",
+                  "Repubs4BabyRape","RepubsLike2Rape","rollcoal","SammyPickles",
+                  "SlowFagBangerz","snowconeoverride","SoakingBedBounce","SoggyFupa",
+                  "SoundingOldMen","sourstingraybuttblast","SSealant",
+                  "StartedFromTheBottomNowImQueer","TamponBill","thatsdoughnuts",
+                  "thx4servants","TioPepesChurro","toetikler","TotallyNotGay",
+                  "TuBerculos1s2","VagrantNegrosSoftlySuckingAssholes",
+                  "VenomousNarcsSellingSweetAmphetamines",
+                  "VeryNiggardySexSwingsAdvertisements","VNSSAsofficialcunt",
+                  "WangWarrior","WhiteClawAndCocaine","WhiteLineHighway",
+                  "WienerWizard","YourDadsFuckToy","VagabonDuneCoon",
+                  "antiqueboner","StevenHonkings","RainwaterCrank",
+                  "SubsandwichDocking","BulgingTrashSack","fucksandwich",
+                  "urinewhore","fuckglove","AfricanSimilac","DoubleAbort",
+                  "BloatoFaggins","CondomStrike","trannyhosefest","gthinomath",
+                  "hookemdano","KenyanBreastmilk","TransgenderApe","bostonshotgun"]
+
+bear_data['firstName'] = bear_name_list
+usec_data['firstName'] = usec_name_list
+
 ##########
 # save and close files
 ##########
-def save_json(item_data, open_file, file_path):
+def save_json(item_data, file_path):
     
     json_obj = json.dumps(item_data, indent=4)
     
     with open(file_path, 'w') as outfile:
         outfile.write(json_obj)
-    
-    open_file.close()  
+ 
     outfile.close()
-    
-save_json(item_data, item_file, item_file_path)
-save_json(global_data, global_file, global_file_path)
+
+save_json(item_data, item_path)
+save_json(global_data, global_path)
+save_json(bear_data, bear_bot_path)
+save_json(usec_data, usec_bot_path)
+save_json(hideout_areas_data, hideout_areas_path)
+save_json(hideout_settings_data, hideout_settings_path)
+save_json(hideout_production_data, hideout_production_path)
