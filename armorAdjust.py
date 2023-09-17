@@ -78,13 +78,13 @@ for key in item_data.keys():
 mod_keys = armor_keys + rig_keys + helmet_keys + armored_equipment_keys
 
 # multiply all durabilities
-durability_adjustment = 3
-for key in mod_keys:
-    try:
-        item_data[key]['_props']['Durability'] *= durability_adjustment 
-        item_data[key]['_props']['MaxDurability'] *= durability_adjustment 
-    except:
-        pass
+# durability_adjustment = 3
+# for key in mod_keys:
+#     try:
+#         item_data[key]['_props']['Durability'] *= durability_adjustment 
+#         item_data[key]['_props']['MaxDurability'] *= durability_adjustment 
+#     except:
+#         pass
 
 # created to rollback making all mag loading speed 
 # positive when it should've been negative
@@ -118,8 +118,8 @@ for key in mag_keys:
 
 # cut base load/unload times in half
 # default 0.85 and 0.3
-global_data['config']['BaseLoadTime'] *= 0.5
-global_data['config']['BaseUnloadTime'] *= 0.5
+global_data['config']['BaseLoadTime'] *= 0.75
+global_data['config']['BaseUnloadTime'] *= 0.75
 
 ###
 # stamina/inertia changes
@@ -130,15 +130,14 @@ global_data['config']['BaseUnloadTime'] *= 0.5
 # global_data['config']['Stamina']['BaseOverweightLimits']['y']
 # global_data['config']['Stamina']['BaseOverweightLimits']['z']
 
-# default
-# {'x': 0.17, 'y': 0.7, 'z': 0}
+# stamina changes
+# default {'x': 0.17, 'y': 0.7, 'z': 0}
 global_data['config']['Stamina']['CrouchConsumption']['x'] = 0.1
 global_data['config']['Stamina']['CrouchConsumption']['y'] = 0.3
 
 global_data['config']['Stamina']['FallDamageMultiplier'] *= 0.25
 
-# default
-# {'x': -3, 'y': -2, 'z': 0}
+# default {'x': -3, 'y': -2, 'z': 0}
 global_data['config']['Stamina']['OverweightConsumptionByPose']['x'] *= 0.5
 global_data['config']['Stamina']['OverweightConsumptionByPose']['y'] *= 0.5
 
@@ -151,12 +150,53 @@ global_data['config']['Stamina']['SprintOverweightLimits']['y'] *= 1.25
 global_data['config']['Stamina']['StandupConsumption']['x'] *= 0.5
 global_data['config']['Stamina']['StandupConsumption']['y'] *= 0.5
 
-global_data['config']['Inertia']['WalkInertia']['x'] *= 0.1
-global_data['config']['Inertia']['WalkInertia']['y'] *= 0.1
+# inertia changes
+inertia_multi = 0.6
+
+# 'SideTime': {'x': 2, 'y': 1, 'z': 0}
+global_data['config']['Inertia']['SideTime']['x'] = 0.0
+global_data['config']['Inertia']['SideTime']['y'] = 0.0
+
+# default "x": 0.1, "y": 0.45
+global_data['config']['Inertia']['MoveTimeRange']['x'] = 0
+global_data['config']['Inertia']['MoveTimeRange']['y'] = 0
+
+# default 0.15
+global_data['config']['Inertia']['MinDirectionBlendTime'] *= inertia_multi
+
+# default "x": 0.05, "y": 0.4675
+global_data['config']['Inertia']['WalkInertia']['x'] *= inertia_multi
+global_data['config']['Inertia']['WalkInertia']['y'] *= inertia_multi
+
+# 0.3
+global_data['config']['Inertia']['BaseJumpPenalty'] *= inertia_multi
+
+# 0.4
+global_data['config']['Inertia']['BaseJumpPenaltyDuration'] *= inertia_multi
+
+# 'x': 4
+global_data['config']['Inertia']['SpeedLimitAfterFallMax']['x'] *= inertia_multi
+
+# default  {'x': 0, 'y': 55, 'z': 0}
+global_data['config']['Inertia']['SprintBrakeInertia']['y'] *= inertia_multi
+
+# tilt is inverted where a larger number is faster/less inertia effect
+# 'x': 0.6, 'y': 0.5
+global_data['config']['Inertia']['TiltInertiaMaxSpeed']['x'] *= 1.3
+global_data['config']['Inertia']['TiltInertiaMaxSpeed']['y'] *= 1.3
+
+# 'x': 1.2, 'y': 0.8
+global_data['config']['Inertia']['TiltMaxSideBackSpeed']['x'] *= 1.3
+global_data['config']['Inertia']['TiltMaxSideBackSpeed']['y'] *= 1.3
+
+# 'x': 0.8, 'y': 0.5
+global_data['config']['Inertia']['TiltStartSideBackSpeed']['x'] *= 1.3
+global_data['config']['Inertia']['TiltStartSideBackSpeed']['y'] *= 1.3
+
 
 # {'x': 0, 'y': 65, 'z': 0.5}
-global_data['config']['Inertia']['InertiaLimits']['y'] = 0.1
-global_data['config']['Inertia']['InertiaLimits']['z'] = 0.1
+# global_data['config']['Inertia']['InertiaLimits']['y'] = 65
+# global_data['config']['Inertia']['InertiaLimits']['z'] = 0.5
 
 ###
 # health items mods
