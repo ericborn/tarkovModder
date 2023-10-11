@@ -6,6 +6,7 @@ Created on Fri Sep 15 17:51:56 2023
 """
 
 import json
+import os
 
 def load_json(file_path):
     item_file = open(file_path, 'r', encoding='utf8')
@@ -13,29 +14,63 @@ def load_json(file_path):
     item_file.close()
     return item_data
 
-global_path = 'G:/eft 13-5-1/EFT/Aki_Data/Server/database/globals.json'
-item_path = 'G:/eft 13-5-1/EFT/Aki_Data/Server/database/templates/items.json'
-bear_bot_path = 'G:/eft 13-5-1/EFT/Aki_Data/Server/database/bots/types/bear.json'
-usec_bot_path = 'G:/eft 13-5-1/EFT/Aki_Data/Server/database/bots/types/usec.json'
-hideout_areas_path = 'G:/eft 13-5-1/EFT/Aki_Data/Server/database/hideout/areas.json'
-hideout_settings_path = 'G:/eft 13-5-1/EFT/Aki_Data/Server/database/hideout/settings.json'
-hideout_production_path = 'G:/eft 13-5-1/EFT/Aki_Data/Server/database/hideout/production.json'
+def save_json(item_data, file_path):
+    json_obj = json.dumps(item_data, indent=4)
+    with open(file_path, 'w') as outfile:
+        outfile.write(json_obj)
+    outfile.close()
+
+base_file_name = 'base.json'
+case_id = '5795f317245977243854e041'
+prapor_id = '54cb50c76803fa8b248b4571'
+bag_parent = '5448e53e4bdc2d60728b4567'
+key_parent = '5c99f98d86f7745c314214b3'
+rig_parent = '5448e5284bdc2dcb718b4567'
+mag_parent = '5448bc234bdc2d3c308b4569'
+ammo_parent = '5485a8684bdc2da71d8b4567'
+key_tool_id = '59fafd4b86f7745ca07e1232'
+therapist_id = '54cb57776803fa99248b456e'
+medical_parent = '5448f39d4bdc2d0a728b4568'
+headwear_parent = '5a341c4086f77401f2541505'
+body_armor_parent = '5448e54d4bdc2dcc718b4568'
+armored_equipment_parent = '57bef4c42459772e8d35a53b'
+
+map_path = 'G:/3.7.0/Aki_Data/Server/database/locations/'
+trader_path = 'G:/3.7.0/Aki_Data/Server/database/traders/'
+ragfair_path = 'G:/3.7.0/Aki_Data/Server/configs/ragfair.json'
+global_path = 'G:/3.7.0/Aki_Data/Server/database/globals.json'
+insurance_path = 'G:/3.7.0/Aki_Data/Server/configs/insurance.json'
+item_path = 'G:/3.7.0/Aki_Data/Server/database/templates/items.json'
+quest_path = 'G:/3.7.0/Aki_Data/Server/database/templates/quests.json'
+bear_bot_path = 'G:/3.7.0/Aki_Data/Server/database/bots/types/bear.json'
+usec_bot_path = 'G:/3.7.0/Aki_Data/Server/database/bots/types/usec.json'
+hideout_areas_path = 'G:/3.7.0/Aki_Data/Server/database/hideout/areas.json'
+hideout_workout_path = 'G:/3.7.0/Aki_Data/Server/database/hideout/qte.json'
+hideout_settings_path = 'G:/3.7.0/Aki_Data/Server/database/hideout/settings.json'
+hideout_scav_case_path = 'G:/3.7.0/Aki_Data/Server/database/hideout/scavcase.json'
+hideout_production_path = 'G:/3.7.0/Aki_Data/Server/database/hideout/production.json'
+prapor_path = trader_path + prapor_id + '/' + base_file_name
+therapist_path = trader_path + therapist_id + '/' + base_file_name
 
 item_data = load_json(item_path)
+quest_data = load_json(quest_path)
 global_data = load_json(global_path)
 bear_data = load_json(bear_bot_path)
 usec_data = load_json(usec_bot_path)
+prapor_data = load_json(prapor_path)
+ragfair_data = load_json(ragfair_path)
+therapist_data = load_json(therapist_path)
+insurance_data = load_json(insurance_path)
 hideout_areas_data = load_json(hideout_areas_path)
+hideout_workout_data = load_json(hideout_workout_path) 
 hideout_settings_data = load_json(hideout_settings_path)
+hideout_scav_case_data = load_json(hideout_scav_case_path)
 hideout_production_data = load_json(hideout_production_path)
 
-body_armor_parent = '5448e54d4bdc2dcc718b4568'
-rig_parent = '5448e5284bdc2dcb718b4567'
-headwear_parent = '5a341c4086f77401f2541505'
-armored_equipment_parent = '57bef4c42459772e8d35a53b'
-mag_parent = '5448bc234bdc2d3c308b4569'
-medical_parent = '5448f39d4bdc2d0a728b4568'
-ammo_parent = '5485a8684bdc2da71d8b4567'
+# secure containers
+container_list = ['544a11ac4bdc2d470e8b456a', '5857a8b324597729ab0a0e7d',
+                  '59db794186f77448bc595262', '5857a8bc2459772bad15db29',
+                  '5c093ca986f7740a1867ab12']
 
 # car, Salewa, grizzly, IFAK, AI-2, AFAK, sanitar ifak
 med_kit_ids = ['590c661e86f7741e566b646a', '544fb45d4bdc2dee738b4568',
@@ -43,12 +78,20 @@ med_kit_ids = ['590c661e86f7741e566b646a', '544fb45d4bdc2dee738b4568',
                '590c678286f77426c9660122', '60098ad7c2240c0fe85c570a',
                '5e99711486f7744bfc4af328']
 
-armor_keys = []
+# bleed, surg kits, pain meds
+other_med_ids = ['5751a25924597722c463c472', '5d02778e86f774203e7dedbe', 
+                 '5d02797c86f774203f38e30a', '5e8488fa988a8701445df1e4',
+                 '5af0548586f7743a532b7e99', '5af0454c86f7746bf20992e8']
+
+bag_keys = []
+key_keys = []
 rig_keys = []
-helmet_keys = []
-armored_equipment_keys = []
 mag_keys = []
 ammo_keys = []
+case_keys = []
+armor_keys = []
+helmet_keys = []
+armored_equipment_keys = []
 all_keys = list(item_data.keys())
 
 for key in item_data.keys():
@@ -66,6 +109,14 @@ for key in item_data.keys():
     if item_data[key]['_parent'] == armored_equipment_parent:
         armored_equipment_keys.append(key)
     
+    # bags
+    if item_data[key]['_parent'] == bag_parent:
+       bag_keys.append(key)
+    
+    # keys
+    if item_data[key]['_parent'] == key_parent:
+       key_keys.append(key)
+    
     # mags
     if item_data[key]['_parent'] == mag_parent:
        mag_keys.append(key)
@@ -73,6 +124,10 @@ for key in item_data.keys():
     # ammo
     if item_data[key]['_parent'] == ammo_parent:
         ammo_keys.append(key)
+        
+    # containers
+    if item_data[key]['_parent'] == case_id:
+        case_keys.append(key)
 
 # all items to mod durability     
 mod_keys = armor_keys + rig_keys + helmet_keys + armored_equipment_keys
@@ -120,6 +175,38 @@ for key in mag_keys:
 # default 0.85 and 0.3
 global_data['config']['BaseLoadTime'] *= 0.75
 global_data['config']['BaseUnloadTime'] *= 0.75
+
+# adjust max number of flea offers to 100 from -10000 to 10000 rep
+global_data['config']['RagFair']['maxActiveOfferCount'][0]['count'] = 100
+global_data['config']['RagFair']['maxActiveOfferCount'][0]['to'] = 10000
+
+# expand bags
+for bags in bag_keys:
+    item_data[bags]['_props']['Grids'][0]['_props']['cellsH'] += 2
+    item_data[bags]['_props']['Grids'][0]['_props']['cellsV'] += 2
+
+# expand secure containers
+for container in container_list:
+    item_data[container]['_props']['Grids'][0]['_props']['cellsH'] += 2
+    item_data[container]['_props']['Grids'][0]['_props']['cellsV'] += 2
+    
+    item_data[container]['_props']['Grids'][0]['_props']['filters'] = []
+
+# expand cases
+# make all cases 2x2 larger and remove item filter
+for case in case_keys:
+    item_data[case]['_props']['Grids'][0]['_props']['cellsH'] += 2
+    item_data[case]['_props']['Grids'][0]['_props']['cellsV'] += 2
+    
+    item_data[case]['_props']['Grids'][0]['_props']['filters'] = []
+
+# manually set the keytool to be 6x6
+# item_data[key_tool_id]['_props']['Grids'][0]['_props']['cellsH'] = 6
+# item_data[key_tool_id]['_props']['Grids'][0]['_props']['cellsV'] = 6
+
+# set all keys to unlimited uses
+for key in key_keys:
+    item_data[key]['_props']['MaximumNumberOfUsage'] = 0
 
 ###
 # stamina/inertia changes
@@ -193,23 +280,63 @@ global_data['config']['Inertia']['TiltMaxSideBackSpeed']['y'] *= 1.3
 global_data['config']['Inertia']['TiltStartSideBackSpeed']['x'] *= 1.3
 global_data['config']['Inertia']['TiltStartSideBackSpeed']['y'] *= 1.3
 
-
 # {'x': 0, 'y': 65, 'z': 0.5}
 # global_data['config']['Inertia']['InertiaLimits']['y'] = 65
 # global_data['config']['Inertia']['InertiaLimits']['z'] = 0.5
 
-###
+#######
+# XP changes
+#######
+global_data['config']['WeaponSkillProgressRate'] = 2
+global_data['config']['SkillsSettings']['WeaponSkillProgressRate'] = 2
+
+# xp for door breach/unlock
+global_data['config']['exp']['expForLockedDoorBreach'] = 100
+global_data['config']['exp']['expForLockedDoorOpen'] = 100
+
+# I think this increases loot exp on subsequent items, no idea
+global_data['config']['exp']['loot_attempts'][1] = 0.5
+global_data['config']['exp']['loot_attempts'][2] = 0.5
+
+# increase xp for a headshot kill
+global_data['config']['exp']['kill']['pmcHeadShotMult'] = 1.75
+
+# reduce distance needed to be considered a longshot
+global_data['config']['exp']['kill']['longShotDistance'] = 25
+
+# increase xp at the end of match for different outcomes
+# lower requirements for survived status to 10 xp or 60 seconds
+global_data['config']['exp']['match_end']['killedMult'] = 1.5
+
+global_data['config']['exp']['match_end']['miaMult'] = 1.5
+global_data['config']['exp']['match_end']['mia_exp_reward'] = 500
+
+global_data['config']['exp']['match_end']['runnerMult'] = 1.5
+global_data['config']['exp']['match_end']['runner_exp_reward'] = 500
+
+global_data['config']['exp']['match_end']['survivedMult'] = 2
+global_data['config']['exp']['match_end']['survived_exp_requirement'] = 10
+global_data['config']['exp']['match_end']['survived_exp_reward'] = 1000
+global_data['config']['exp']['match_end']['survived_seconds_requirement'] = 60
+
+#######
+# repair durability costs
+#######
+global_data['config']['RepairSettings']['durabilityPointCostArmor'] = 0.05
+global_data['config']['RepairSettings']['durabilityPointdurabilityPointCostGunsCostArmor'] = 0.05
+
+#######
 # health items mods
-###
+#######
 def mod_med_item(item_id, max_uses, hp_recovery_rate, stim_buff=''):
     item_data[item_id]['_props']['MaxHpResource'] = max_uses
     item_data[item_id]['_props']['hpResourceRate'] = hp_recovery_rate
     item_data[item_id]['_props']['StimulatorBuffs'] = stim_buff
 
 # car, Salewa, grizzly, AI-2, IFAK, AFAK, sanitar ifak
-mod_med_item(med_kit_ids[0], 20, 0, 'BuffsCarKit')
-mod_med_item(med_kit_ids[1], 30, 0, 'BuffsSalewa')
-mod_med_item(med_kit_ids[2], 60, 0, 'BuffsGrizzly')
+mod_med_item(med_kit_ids[0], 30, 0, 'BuffsCarKit')
+mod_med_item(med_kit_ids[1], 50, 0, 'BuffsSalewa')
+mod_med_item(med_kit_ids[2], 100, 0, 'BuffsGrizzly')
 mod_med_item(med_kit_ids[3], 500, 125)
 mod_med_item(med_kit_ids[4], 1250, 175)
 mod_med_item(med_kit_ids[5], 2000, 225)
@@ -231,6 +358,9 @@ def add_med_buff(buff_name, duration, heal_amt):
 add_med_buff('BuffsCarKit', 300, 5)
 add_med_buff('BuffsSalewa', 300, 10)
 add_med_buff('BuffsGrizzly', 600, 20)
+
+for med in other_med_ids:
+    item_data[med]['_props']['MaxHpResource'] *= 10
 
 ###
 # ammo adjusts
@@ -255,6 +385,27 @@ for key in all_keys:
     except:
         pass
 ####
+# buy/sell all items on flea
+####
+for item in item_data:
+    item_data[item]['_props']['CanSellOnRagfair'] = True
+    item_data[item]['_props']['CanRequireOnRagfair'] = True
+
+ragfair_data['sell']['simulatedSellHours'] = 1
+ragfair_data['sell']['chance']['base'] = 100
+ragfair_data['sell']['chance']['overpriced'] = 3
+ragfair_data['sell']['chance']['underpriced'] = 3
+ragfair_data['sell']['time']['base'] = 0.1
+ragfair_data['sell']['time']['max'] = 0.1
+
+ragfair_data['dynamic']['purchasesAreFoundInRaid'] = True
+ragfair_data['dynamic']['blacklist']['enableBsgList'] = False
+ragfair_data['dynamic']['offerAdjustment']['adjustPriceWhenBelowHandbookPrice'] = True
+ragfair_data['dynamic']['offerAdjustment']['maxPriceDifferenceBelowHandbookPercent'] = 0.01
+ragfair_data['dynamic']['offerAdjustment']['handbookPriceMultipier'] = 5
+ragfair_data['dynamic']['offerAdjustment']['priceThreshholdRub'] = 999999
+
+####
 # hideout
 ####
 # smaller is better
@@ -262,18 +413,64 @@ for key in all_keys:
 # 'airFilterUnitFlowRate': 0.004722222222222,
 # larger is better
 # 'gpuBoostRate': 0.041225
-hideout_settings_data['generatorFuelFlowRate'] *= 0.25
-hideout_settings_data['airFilterUnitFlowRate'] *= 0.25
-hideout_settings_data['gpuBoostRate'] = 0.09
+hideout_settings_data['generatorFuelFlowRate'] *= 0.5
+hideout_settings_data['airFilterUnitFlowRate'] *= 0.5
+hideout_settings_data['gpuBoostRate'] = 0.06
 
 # set construction of any hideout areas to 1
+# iterate through areas looking for bitcoin farm id 5d494a445b56502f18c98a10
+# iterate through stages of the farm looking for bonus attributes with
+# a filter for the graphics card id 57347ca924597744596b4e71
+# multiply the bonus by 10
 for area in hideout_areas_data:
+    if area['_id'] == '5d494a445b56502f18c98a10':
+        for key in area['stages'].keys():
+            if area['stages'][key]['bonuses']:
+                if area['stages'][key]['bonuses'][0]['filter'][0] == '57347ca924597744596b4e71':
+                    area['stages'][key]['bonuses'][0]['value'] += 10   
     for key in area['stages'].keys():
         area['stages'][key]['constructionTime'] = 1
 
 # set production of all items to 1 
 for items in hideout_production_data:
     items['productionTime'] = 1
+
+# set workout speed and success range to the same values for each stage    
+for workout in range(0, len(hideout_workout_data[0]['quickTimeEvents'])):
+    hideout_workout_data[0]['quickTimeEvents'][workout]['successRange'] = {'x': 0.50, 'y': 0.15},
+    hideout_workout_data[0]['quickTimeEvents'][workout]['speed'] = 2
+
+# set all scav case runs to 30 min
+# add 1 extra min and max products for common, rare and super rare
+# values stored as a string in the json so conversion between types was needed
+for scav in range(0, len(hideout_scav_case_data)):
+    hideout_scav_case_data[scav]['ProductionTime'] = 1800
+    for product in hideout_scav_case_data[scav]['EndProducts']:
+        min_value = int(hideout_scav_case_data[scav]['EndProducts'][product]['min'])
+        min_value += 1
+        
+        max_value = int(hideout_scav_case_data[scav]['EndProducts'][product]['max'])
+        max_value += 1
+        
+        hideout_scav_case_data[scav]['EndProducts'][product]['min'] = str(min_value)
+        hideout_scav_case_data[scav]['EndProducts'][product]['max'] = str(max_value)
+
+####
+# insurance changes
+####
+insurance_data['insuranceMultiplier'][prapor_id] = 0.15
+insurance_data['insuranceMultiplier'][therapist_id] = 0.15
+
+insurance_data['returnChancePercent'][prapor_id] = 0.95
+insurance_data['returnChancePercent'][therapist_id] = 0.95
+insurance_data['runIntervalSeconds'] = 60
+
+prapor_data['insurance']['min_return_hour'] = 0
+prapor_data['insurance']['max_return_hour'] = 0
+prapor_data['insurance']['max_storage_time'] = 666
+therapist_data['insurance']['min_return_hour'] = 0
+therapist_data['insurance']['max_return_hour'] = 0
+therapist_data['insurance']['max_storage_time'] = 666
 
 ####
 # bot name changes
@@ -369,22 +566,57 @@ usec_name_list = ["12YoSoaking","2Dudes1Butt","2DudesCuddling","2DudesSoaking",
 bear_data['firstName'] = bear_name_list
 usec_data['firstName'] = usec_name_list
 
+########
+# map changes
+########
+folder_list = os.listdir(map_path)
+remove_list = ['develop','hideout','privatearea','suburbs','terminal',
+               'town','base.json']
+
+for items in remove_list:
+    folder_list.remove(items)
+
+for folder in folder_list:
+    full_path = map_path + folder + '/' + base_file_name
+    map_data = load_json(full_path)
+    
+    map_data['EscapeTimeLimit'] *= 2
+    map_data['MinDistToExitPoint'] = 1
+    map_data['MinDistToFreePoint'] = 1
+    map_data['BotStop'] *= 2
+    map_data['GlobalContainerChanceModifier'] *= 2
+    map_data['GlobalLootChanceModifier'] *= 2
+    
+    for exits in range(0,len(map_data['exits'])):
+        map_data['exits'][exits]['Chance'] = 100
+        
+    save_json(map_data, full_path)
+
+###
+# quest changes
+###
+# remove wait time until quest can be started
+for quest in quest_data:
+    try:
+        if quest_data[quest]['conditions']['AvailableForStart'][0]['_parent'] == 'Quest':
+            quest_data[quest]['conditions']['AvailableForStart'][0]['_props']['availableAfter'] = 0
+    except:
+        pass
+
 ##########
 # save and close files
 ##########
-def save_json(item_data, file_path):
-    
-    json_obj = json.dumps(item_data, indent=4)
-    
-    with open(file_path, 'w') as outfile:
-        outfile.write(json_obj)
- 
-    outfile.close()
-
 save_json(item_data, item_path)
+save_json(prapor_data, prapor_path)
+save_json(quest_data, quest_path)
 save_json(global_data, global_path)
 save_json(bear_data, bear_bot_path)
 save_json(usec_data, usec_bot_path)
+save_json(therapist_data, therapist_path)
+save_json(ragfair_data, ragfair_path)
+save_json(insurance_data, insurance_path)
 save_json(hideout_areas_data, hideout_areas_path)
+save_json(hideout_workout_data, hideout_workout_path)
 save_json(hideout_settings_data, hideout_settings_path)
+save_json(hideout_scav_case_data, hideout_scav_case_path)
 save_json(hideout_production_data, hideout_production_path)
