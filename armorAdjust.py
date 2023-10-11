@@ -4,9 +4,9 @@ Created on Fri Sep 15 17:51:56 2023
 
 @author: Eric
 """
-
-import json
 import os
+import json
+import shutil
 
 def load_json(file_path):
     item_file = open(file_path, 'r', encoding='utf8')
@@ -37,6 +37,8 @@ armored_equipment_parent = '57bef4c42459772e8d35a53b'
 
 map_path = 'G:/3.7.0/Aki_Data/Server/database/locations/'
 trader_path = 'G:/3.7.0/Aki_Data/Server/database/traders/'
+trader_img_path = 'G:/3.7.0/Aki_Data/Server/images/traders/'
+mod_trader_img_path = 'C:/Users/Eric/Desktop/eft/mods/traders/'
 ragfair_path = 'G:/3.7.0/Aki_Data/Server/configs/ragfair.json'
 global_path = 'G:/3.7.0/Aki_Data/Server/database/globals.json'
 insurance_path = 'G:/3.7.0/Aki_Data/Server/configs/insurance.json'
@@ -415,7 +417,7 @@ ragfair_data['dynamic']['offerAdjustment']['priceThreshholdRub'] = 999999
 # 'gpuBoostRate': 0.041225
 hideout_settings_data['generatorFuelFlowRate'] *= 0.5
 hideout_settings_data['airFilterUnitFlowRate'] *= 0.5
-hideout_settings_data['gpuBoostRate'] = 0.06
+hideout_settings_data['gpuBoostRate'] = 0.041225
 
 # set construction of any hideout areas to 1
 # iterate through areas looking for bitcoin farm id 5d494a445b56502f18c98a10
@@ -620,3 +622,11 @@ save_json(hideout_workout_data, hideout_workout_path)
 save_json(hideout_settings_data, hideout_settings_path)
 save_json(hideout_scav_case_data, hideout_scav_case_path)
 save_json(hideout_production_data, hideout_production_path)
+
+#####
+# replace trader img files
+#####
+img_list = os.listdir(mod_trader_img_path)
+
+for img in img_list:
+    shutil.copy(mod_trader_img_path+img, trader_img_path+img)
