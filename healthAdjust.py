@@ -13,7 +13,7 @@ bot_health_mod_amount = 1.25
 #############
 # mod bots
 #############
-file_path = 'G:/3.7.0/Aki_Data/Server/database/bots/types/'
+file_path = 'G:/3.7.1/Aki_Data/Server/database/bots/types/'
 file_list = os.listdir(file_path)
 
 for files in file_list:
@@ -36,9 +36,9 @@ for files in file_list:
 # only works for new profiles
 #############
 
-player_health_mod = 1.5
+player_health_mod = 3
 
-player_file_path = 'G:/3.7.0/Aki_Data/Server/database/globals.json'
+player_file_path = 'G:/3.7.1/Aki_Data/Server/database/globals.json'
 player_file = open(player_file_path, 'r', encoding='utf8')
 
 player_data = json.loads(player_file.read())
@@ -59,7 +59,7 @@ player_outfile.close()
 #############
 # mod existing profiles
 #############
-player_profile_path = 'G:/3.7.0/user/profiles/'
+player_profile_path = 'G:/3.7.1/user/profiles/'
 profile_list = os.listdir(player_profile_path)
 
 for profiles in profile_list:

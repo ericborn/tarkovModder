@@ -35,22 +35,22 @@ headwear_parent = '5a341c4086f77401f2541505'
 body_armor_parent = '5448e54d4bdc2dcc718b4568'
 armored_equipment_parent = '57bef4c42459772e8d35a53b'
 
-map_path = 'G:/3.7.0/Aki_Data/Server/database/locations/'
-trader_path = 'G:/3.7.0/Aki_Data/Server/database/traders/'
-trader_img_path = 'G:/3.7.0/Aki_Data/Server/images/traders/'
+map_path = 'G:/3.7.1/Aki_Data/Server/database/locations/'
+trader_path = 'G:/3.7.1/Aki_Data/Server/database/traders/'
+trader_img_path = 'G:/3.7.1/Aki_Data/Server/images/traders/'
 mod_trader_img_path = 'C:/Users/Eric/Desktop/eft/mods/traders/'
-ragfair_path = 'G:/3.7.0/Aki_Data/Server/configs/ragfair.json'
-global_path = 'G:/3.7.0/Aki_Data/Server/database/globals.json'
-insurance_path = 'G:/3.7.0/Aki_Data/Server/configs/insurance.json'
-item_path = 'G:/3.7.0/Aki_Data/Server/database/templates/items.json'
-quest_path = 'G:/3.7.0/Aki_Data/Server/database/templates/quests.json'
-bear_bot_path = 'G:/3.7.0/Aki_Data/Server/database/bots/types/bear.json'
-usec_bot_path = 'G:/3.7.0/Aki_Data/Server/database/bots/types/usec.json'
-hideout_areas_path = 'G:/3.7.0/Aki_Data/Server/database/hideout/areas.json'
-hideout_workout_path = 'G:/3.7.0/Aki_Data/Server/database/hideout/qte.json'
-hideout_settings_path = 'G:/3.7.0/Aki_Data/Server/database/hideout/settings.json'
-hideout_scav_case_path = 'G:/3.7.0/Aki_Data/Server/database/hideout/scavcase.json'
-hideout_production_path = 'G:/3.7.0/Aki_Data/Server/database/hideout/production.json'
+ragfair_path = 'G:/3.7.1/Aki_Data/Server/configs/ragfair.json'
+global_path = 'G:/3.7.1/Aki_Data/Server/database/globals.json'
+insurance_path = 'G:/3.7.1/Aki_Data/Server/configs/insurance.json'
+item_path = 'G:/3.7.1/Aki_Data/Server/database/templates/items.json'
+quest_path = 'G:/3.7.1/Aki_Data/Server/database/templates/quests.json'
+bear_bot_path = 'G:/3.7.1/Aki_Data/Server/database/bots/types/bear.json'
+usec_bot_path = 'G:/3.7.1/Aki_Data/Server/database/bots/types/usec.json'
+hideout_areas_path = 'G:/3.7.1/Aki_Data/Server/database/hideout/areas.json'
+hideout_workout_path = 'G:/3.7.1/Aki_Data/Server/database/hideout/qte.json'
+hideout_settings_path = 'G:/3.7.1/Aki_Data/Server/database/hideout/settings.json'
+hideout_scav_case_path = 'G:/3.7.1/Aki_Data/Server/database/hideout/scavcase.json'
+hideout_production_path = 'G:/3.7.1/Aki_Data/Server/database/hideout/production.json'
 prapor_path = trader_path + prapor_id + '/' + base_file_name
 therapist_path = trader_path + therapist_id + '/' + base_file_name
 
@@ -68,6 +68,10 @@ hideout_workout_data = load_json(hideout_workout_path)
 hideout_settings_data = load_json(hideout_settings_path)
 hideout_scav_case_data = load_json(hideout_scav_case_path)
 hideout_production_data = load_json(hideout_production_path)
+
+# money list
+money_list = ['5449016a4bdc2d6f028b456f', '5696686a4bdc2da3298b456a',
+              '569668774bdc2da2298b4568']
 
 # secure containers
 container_list = ['544a11ac4bdc2d470e8b456a', '5857a8b324597729ab0a0e7d',
@@ -181,6 +185,10 @@ global_data['config']['BaseUnloadTime'] *= 0.75
 # adjust max number of flea offers to 100 from -10000 to 10000 rep
 global_data['config']['RagFair']['maxActiveOfferCount'][0]['count'] = 100
 global_data['config']['RagFair']['maxActiveOfferCount'][0]['to'] = 10000
+
+# larger money stack size
+for money in money_list:
+    item_data[money]['_props']['StackMaxSize'] = 999999
 
 # expand bags
 for bags in bag_keys:
