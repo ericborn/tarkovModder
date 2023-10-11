@@ -295,8 +295,8 @@ global_data['config']['exp']['expForLockedDoorBreach'] = 100
 global_data['config']['exp']['expForLockedDoorOpen'] = 100
 
 # I think this increases loot exp on subsequent items, no idea
-global_data['config']['exp']['loot_attempts'][1] = 0.5
-global_data['config']['exp']['loot_attempts'][2] = 0.5
+global_data['config']['exp']['loot_attempts'][1] = {'k_exp': 0.5}
+global_data['config']['exp']['loot_attempts'][2] = {'k_exp': 0.5}
 
 # increase xp for a headshot kill
 global_data['config']['exp']['kill']['pmcHeadShotMult'] = 1.75
@@ -437,7 +437,7 @@ for items in hideout_production_data:
 
 # set workout speed and success range to the same values for each stage    
 for workout in range(0, len(hideout_workout_data[0]['quickTimeEvents'])):
-    hideout_workout_data[0]['quickTimeEvents'][workout]['successRange'] = {'x': 0.50, 'y': 0.15},
+    hideout_workout_data[0]['quickTimeEvents'][workout]['successRange'] = {'x': 0.50, 'y': 0.15}
     hideout_workout_data[0]['quickTimeEvents'][workout]['speed'] = 2
 
 # set all scav case runs to 30 min
@@ -607,13 +607,13 @@ for quest in quest_data:
 # save and close files
 ##########
 save_json(item_data, item_path)
-save_json(prapor_data, prapor_path)
 save_json(quest_data, quest_path)
+save_json(prapor_data, prapor_path)
 save_json(global_data, global_path)
 save_json(bear_data, bear_bot_path)
 save_json(usec_data, usec_bot_path)
-save_json(therapist_data, therapist_path)
 save_json(ragfair_data, ragfair_path)
+save_json(therapist_data, therapist_path)
 save_json(insurance_data, insurance_path)
 save_json(hideout_areas_data, hideout_areas_path)
 save_json(hideout_workout_data, hideout_workout_path)
