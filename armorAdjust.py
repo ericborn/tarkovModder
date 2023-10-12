@@ -20,6 +20,9 @@ def save_json(item_data, file_path):
         outfile.write(json_obj)
     outfile.close()
 
+install_drive = 'G:/'
+eft_version = '3.7.0/'
+
 base_file_name = 'base.json'
 case_id = '5795f317245977243854e041'
 prapor_id = '54cb50c76803fa8b248b4571'
@@ -35,22 +38,22 @@ headwear_parent = '5a341c4086f77401f2541505'
 body_armor_parent = '5448e54d4bdc2dcc718b4568'
 armored_equipment_parent = '57bef4c42459772e8d35a53b'
 
-map_path = 'G:/3.7.1/Aki_Data/Server/database/locations/'
-trader_path = 'G:/3.7.1/Aki_Data/Server/database/traders/'
-trader_img_path = 'G:/3.7.1/Aki_Data/Server/images/traders/'
+map_path = install_drive + eft_version + 'Aki_Data/Server/database/locations/'
+trader_path = install_drive + eft_version + 'Aki_Data/Server/database/traders/'
+trader_img_path = install_drive + eft_version + 'Aki_Data/Server/images/traders/'
 mod_trader_img_path = 'C:/Users/Eric/Desktop/eft/mods/traders/'
-ragfair_path = 'G:/3.7.1/Aki_Data/Server/configs/ragfair.json'
-global_path = 'G:/3.7.1/Aki_Data/Server/database/globals.json'
-insurance_path = 'G:/3.7.1/Aki_Data/Server/configs/insurance.json'
-item_path = 'G:/3.7.1/Aki_Data/Server/database/templates/items.json'
-quest_path = 'G:/3.7.1/Aki_Data/Server/database/templates/quests.json'
-bear_bot_path = 'G:/3.7.1/Aki_Data/Server/database/bots/types/bear.json'
-usec_bot_path = 'G:/3.7.1/Aki_Data/Server/database/bots/types/usec.json'
-hideout_areas_path = 'G:/3.7.1/Aki_Data/Server/database/hideout/areas.json'
-hideout_workout_path = 'G:/3.7.1/Aki_Data/Server/database/hideout/qte.json'
-hideout_settings_path = 'G:/3.7.1/Aki_Data/Server/database/hideout/settings.json'
-hideout_scav_case_path = 'G:/3.7.1/Aki_Data/Server/database/hideout/scavcase.json'
-hideout_production_path = 'G:/3.7.1/Aki_Data/Server/database/hideout/production.json'
+ragfair_path = install_drive + eft_version + 'Aki_Data/Server/configs/ragfair.json'
+global_path = install_drive + eft_version + 'Aki_Data/Server/database/globals.json'
+insurance_path = install_drive + eft_version + 'Aki_Data/Server/configs/insurance.json'
+item_path = install_drive + eft_version + 'Aki_Data/Server/database/templates/items.json'
+quest_path = install_drive + eft_version + 'Aki_Data/Server/database/templates/quests.json'
+bear_bot_path = install_drive + eft_version + 'Aki_Data/Server/database/bots/types/bear.json'
+usec_bot_path = install_drive + eft_version + 'Aki_Data/Server/database/bots/types/usec.json'
+hideout_areas_path = install_drive + eft_version + 'Aki_Data/Server/database/hideout/areas.json'
+hideout_workout_path = install_drive + eft_version + 'Aki_Data/Server/database/hideout/qte.json'
+hideout_settings_path = install_drive + eft_version + 'Aki_Data/Server/database/hideout/settings.json'
+hideout_scav_case_path = install_drive + eft_version + 'Aki_Data/Server/database/hideout/scavcase.json'
+hideout_production_path = install_drive + eft_version + 'Aki_Data/Server/database/hideout/production.json'
 prapor_path = trader_path + prapor_id + '/' + base_file_name
 therapist_path = trader_path + therapist_id + '/' + base_file_name
 
@@ -382,10 +385,15 @@ for med in other_med_ids:
 # distinct_ammo = set(distinct_ammo)
 
 for key in ammo_keys:
-    if item_data[key]['_props']['StackMaxSize'] in [15, 20]:
-        item_data[key]['_props']['StackMaxSize'] = 100
-    if item_data[key]['_props']['StackMaxSize'] in [30, 40, 50, 70]:
-        item_data[key]['_props']['StackMaxSize'] = 300
+    # set all ammo max stack to 600
+    item_data[key]['_props']['StackMaxSize'] = 600
+    
+    # set max ammo stack by ammo type
+    # if item_data[key]['_props']['StackMaxSize'] in [15, 20]:
+    #     item_data[key]['_props']['StackMaxSize'] = 100
+    # if item_data[key]['_props']['StackMaxSize'] in [30, 40, 50, 70]:
+    #     item_data[key]['_props']['StackMaxSize'] = 300
+
 
 # Adjust weight of all items
 weight_modifier = 0.35
