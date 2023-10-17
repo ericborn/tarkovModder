@@ -20,8 +20,8 @@ def save_json(item_data, file_path):
         outfile.write(json_obj)
     outfile.close()
 
-install_drive = 'G:/'
-eft_version = '3.7.0/'
+install_drive = 'C:/'
+eft_version = 'eft 3.7.1/'
 
 base_file_name = 'base.json'
 case_id = '5795f317245977243854e041'
@@ -38,12 +38,15 @@ headwear_parent = '5a341c4086f77401f2541505'
 body_armor_parent = '5448e54d4bdc2dcc718b4568'
 armored_equipment_parent = '57bef4c42459772e8d35a53b'
 
+mod_trader_img_path = 'C:/Users/Eric/Desktop/eft/mods/traders/'
+bot_path = install_drive + eft_version + 'Aki_Data/Server/configs/bot.json'
 map_path = install_drive + eft_version + 'Aki_Data/Server/database/locations/'
 trader_path = install_drive + eft_version + 'Aki_Data/Server/database/traders/'
 trader_img_path = install_drive + eft_version + 'Aki_Data/Server/images/traders/'
-mod_trader_img_path = 'C:/Users/Eric/Desktop/eft/mods/traders/'
 ragfair_path = install_drive + eft_version + 'Aki_Data/Server/configs/ragfair.json'
 global_path = install_drive + eft_version + 'Aki_Data/Server/database/globals.json'
+location_path = install_drive + eft_version + 'Aki_Data/Server/configs/location.json'
+quest_config_path = install_drive + eft_version + 'Aki_Data/Server/configs/quest.json'
 insurance_path = install_drive + eft_version + 'Aki_Data/Server/configs/insurance.json'
 item_path = install_drive + eft_version + 'Aki_Data/Server/database/templates/items.json'
 quest_path = install_drive + eft_version + 'Aki_Data/Server/database/templates/quests.json'
@@ -57,6 +60,7 @@ hideout_production_path = install_drive + eft_version + 'Aki_Data/Server/databas
 prapor_path = trader_path + prapor_id + '/' + base_file_name
 therapist_path = trader_path + therapist_id + '/' + base_file_name
 
+bot_data = load_json(bot_path)
 item_data = load_json(item_path)
 quest_data = load_json(quest_path)
 global_data = load_json(global_path)
@@ -64,8 +68,10 @@ bear_data = load_json(bear_bot_path)
 usec_data = load_json(usec_bot_path)
 prapor_data = load_json(prapor_path)
 ragfair_data = load_json(ragfair_path)
+location_data = load_json(location_path)
 therapist_data = load_json(therapist_path)
 insurance_data = load_json(insurance_path)
+quest_config_data = load_json(quest_config_path)
 hideout_areas_data = load_json(hideout_areas_path)
 hideout_workout_data = load_json(hideout_workout_path) 
 hideout_settings_data = load_json(hideout_settings_path)
@@ -170,24 +176,54 @@ mod_keys = armor_keys + rig_keys + helmet_keys + armored_equipment_keys
 # need to figure out the formula for diminishing returns
 for key in mag_keys:
     try:
-        if item_data[key]['_props']['LoadUnloadModifier'] >= 0:
-            item_data[key]['_props']['LoadUnloadModifier'] = -20
-        if item_data[key]['_props']['LoadUnloadModifier'] <= -1 and \
-            item_data[key]['_props']['LoadUnloadModifier']>= -15:
-                item_data[key]['_props']['LoadUnloadModifier'] = -35
-        if item_data[key]['_props']['LoadUnloadModifier'] <= -16:
-            item_data[key]['_props']['LoadUnloadModifier'] = -45
+        # static load/unload mod to -35
+        item_data[key]['_props']['LoadUnloadModifier'] = -35
+        
+        # tiered list, needs refinement
+        # if item_data[key]['_props']['LoadUnloadModifier'] >= 0:
+        #     item_data[key]['_props']['LoadUnloadModifier'] = -20
+        # if item_data[key]['_props']['LoadUnloadModifier'] <= -1 and \
+        #     item_data[key]['_props']['LoadUnloadModifier']>= -15:
+        #         item_data[key]['_props']['LoadUnloadModifier'] = -35
+        # if item_data[key]['_props']['LoadUnloadModifier'] <= -16:
+        #     item_data[key]['_props']['LoadUnloadModifier'] = -45
+        
+        # static check mod to -20
+        item_data[key]['_props']['CheckTimeModifier'] = -20
+        
+        # increase all mags ammo capacity by 1.5
+        item_data[key]['_props']['Cartridges'][0]['_max_count'] *= 1.5
+        
+        
+        # if mags are 1 wide and more than 2 tall make 2 tall
+        # prevents p90 mags from being mis-scaled
+        if item_data[key]['_props']['Width'] == 1 and item_data[key]['_props']['Height'] > 2:
+            item_data[key]['_props']['Height'] = 2
+            
+        # makes extra tall mags only make weapons 1 cell taller instead of 2
+        if item_data[key]['_props']['ExtraSizeDown'] == 2:
+            item_data[key]['_props']['ExtraSizeDown'] = 1
+
     except:
         pass
+    
+    
+
+# set 
+# default 0.85 and 0.3
+global_data['config']['BaseLoadTime'] = 0.4
+global_data['config']['BaseUnloadTime'] = 0.15
 
 # cut base load/unload times in half
-# default 0.85 and 0.3
-global_data['config']['BaseLoadTime'] *= 0.75
-global_data['config']['BaseUnloadTime'] *= 0.75
+# global_data['config']['BaseLoadTime'] *= 0.5
+# global_data['config']['BaseUnloadTime'] *= 0.5
 
 # adjust max number of flea offers to 100 from -10000 to 10000 rep
 global_data['config']['RagFair']['maxActiveOfferCount'][0]['count'] = 100
 global_data['config']['RagFair']['maxActiveOfferCount'][0]['to'] = 10000
+global_data['config']['RagFair']['youSellOfferMaxStorageTimeInHour'] = 600,
+global_data['config']['RagFair']['yourOfferDidNotSellMaxStorageTimeInHour'] = 600
+global_data['config']['RagFair']['isOnlyFoundInRaidAllowed'] = False
 
 # larger money stack size
 for money in money_list:
@@ -300,8 +336,8 @@ global_data['config']['Inertia']['TiltStartSideBackSpeed']['y'] *= 1.3
 #######
 # XP changes
 #######
-global_data['config']['WeaponSkillProgressRate'] = 2
-global_data['config']['SkillsSettings']['WeaponSkillProgressRate'] = 2
+global_data['config']['WeaponSkillProgressRate'] = 3
+global_data['config']['SkillsSettings']['WeaponSkillProgressRate'] = 3
 
 # xp for door breach/unlock
 global_data['config']['exp']['expForLockedDoorBreach'] = 100
@@ -312,31 +348,95 @@ global_data['config']['exp']['loot_attempts'][1] = {'k_exp': 0.5}
 global_data['config']['exp']['loot_attempts'][2] = {'k_exp': 0.5}
 
 # increase xp for a headshot kill
-global_data['config']['exp']['kill']['pmcHeadShotMult'] = 1.75
+global_data['config']['exp']['kill']['pmcHeadShotMult'] = 3
 
 # reduce distance needed to be considered a longshot
 global_data['config']['exp']['kill']['longShotDistance'] = 25
 
 # increase xp at the end of match for different outcomes
 # lower requirements for survived status to 10 xp or 60 seconds
-global_data['config']['exp']['match_end']['killedMult'] = 1.5
+global_data['config']['exp']['match_end']['killedMult'] = 3
 
-global_data['config']['exp']['match_end']['miaMult'] = 1.5
-global_data['config']['exp']['match_end']['mia_exp_reward'] = 500
+global_data['config']['exp']['match_end']['miaMult'] = 3
+global_data['config']['exp']['match_end']['mia_exp_reward'] = 1500
 
-global_data['config']['exp']['match_end']['runnerMult'] = 1.5
-global_data['config']['exp']['match_end']['runner_exp_reward'] = 500
+global_data['config']['exp']['match_end']['runnerMult'] = 3
+global_data['config']['exp']['match_end']['runner_exp_reward'] = 1500
 
-global_data['config']['exp']['match_end']['survivedMult'] = 2
+global_data['config']['exp']['match_end']['survivedMult'] = 5
 global_data['config']['exp']['match_end']['survived_exp_requirement'] = 10
-global_data['config']['exp']['match_end']['survived_exp_reward'] = 1000
+global_data['config']['exp']['match_end']['survived_exp_reward'] = 5000
 global_data['config']['exp']['match_end']['survived_seconds_requirement'] = 60
+
+# modify skill progression
+global_data['config']['SkillMinEffectiveness'] = 0.001
+global_data['config']['SkillPointsBeforeFatigue'] = 10
+
+# Aim drills
+global_data['config']['SkillsSettings']['AimDrills']['WeaponShotAction'] = 0.6
+
+# Assault
+global_data['config']['SkillsSettings']['Assault']['WeaponChamberAction'] = 0.25
+global_data['config']['SkillsSettings']['Assault']['WeaponFixAction'] = 0.25
+global_data['config']['SkillsSettings']['Assault']['WeaponReloadAction'] = 0.25
+global_data['config']['SkillsSettings']['Assault']['WeaponShotAction'] = 0.25
+
+# Attention
+global_data['config']['SkillsSettings']['Attention']['DependentSkillRatios'][0]['Ratio'] = 0.0001
+global_data['config']['SkillsSettings']['Attention']['FindActionFalse'] = 0.6
+global_data['config']['SkillsSettings']['Attention']['FindActionTrue'] = 0.3
+
+# Charisma
+global_data['config']['SkillsSettings']['Charisma']['BonusSettings']['EliteBonusSettings']['RepeatableQuestExtraCount'] = 3
+global_data['config']['SkillsSettings']['Charisma']['BonusSettings']['EliteBonusSettings']['ScavCaseDiscount'] = 0.25
+global_data['config']['SkillsSettings']['Charisma']['BonusSettings']['LevelBonusSettings']['InsuranceDiscount'] = 0.01
+global_data['config']['SkillsSettings']['Charisma']['BonusSettings']['LevelBonusSettings']['InsuranceTraderDiscount'] = 0.01
+global_data['config']['SkillsSettings']['Charisma']['BonusSettings']['LevelBonusSettings']['PaidExitDiscount'] = 0.01
+global_data['config']['SkillsSettings']['Charisma']['BonusSettings']['LevelBonusSettings']['RepeatableQuestChangeDiscount'] = 0.01
+global_data['config']['SkillsSettings']['Charisma']['SkillProgressAtn'] = 1
+global_data['config']['SkillsSettings']['Charisma']['SkillProgressInt'] = 1
+global_data['config']['SkillsSettings']['Charisma']['SkillProgressPer'] = 1
+
+# Covert Movement
+global_data['config']['SkillsSettings']['CovertMovement']['MovementAction'] = 0.075 
+
+# Crafting
+global_data['config']['SkillsSettings']['Crafting']['CraftTimeReductionPerLevel'] = 1.5
+global_data['config']['SkillsSettings']['Crafting']['CraftingCycleHours'] = 4
+global_data['config']['SkillsSettings']['Crafting']['CraftingPointsToInteligence'] = 5
+global_data['config']['SkillsSettings']['Crafting']['EliteExtraProductions'] = 3
+global_data['config']['SkillsSettings']['Crafting']['PointsPerCraftingCycle'] = 10
+global_data['config']['SkillsSettings']['Crafting']['PointsPerUniqueCraftCycle'] = 10
+global_data['config']['SkillsSettings']['Crafting']['ProductionTimeReductionPerLevel'] = 2
+# unsure what this means, 1 is default
+# global_data['config']['SkillsSettings']['Crafting']['UniqueCraftsPerCycle'] = 1
+
+# Endurance
+global_data['config']['SkillsSettings']['Endurance']['DependentSkillRatios'][0]['Ratio'] = 0.01
+global_data['config']['SkillsSettings']['Endurance']['GainPerFatigueStack'] = 0.1
+global_data['config']['SkillsSettings']['Endurance']['MovementAction'] = 0.01
+global_data['config']['SkillsSettings']['Endurance']['QTELevelMultipliers'] = {'10': {'Multiplier': 3},
+                                                                               '20': {'Multiplier': 2},
+                                                                               '30': {'Multiplier': 1}}
+global_data['config']['SkillsSettings']['Endurance']['SprintAction'] = 0.1
+
+# Health
+global_data['config']['SkillsSettings']['Health']['SkillProgress'] = 1.25
+
+# TODO
+# finish the rest of the skills
 
 #######
 # repair durability costs
 #######
-global_data['config']['RepairSettings']['durabilityPointCostArmor'] = 0.05
-global_data['config']['RepairSettings']['durabilityPointdurabilityPointCostGunsCostArmor'] = 0.05
+global_data['config']['RepairSettings']['durabilityPointCostArmor'] = 0.01
+global_data['config']['RepairSettings']['durabilityPointdurabilityPointCostGunsCostArmor'] = 0.01
+
+for material in global_data['config']['ArmorMaterials']:
+    global_data['config']['ArmorMaterials'][material]['MinRepairDegradation'] = 0.001
+    global_data['config']['ArmorMaterials'][material]['MinRepairKitDegradation'] = 0.001
+    global_data['config']['ArmorMaterials'][material]['MaxRepairDegradation'] = 0.001
+    global_data['config']['ArmorMaterials'][material]['MaxRepairKitDegradation'] = 0.001
 
 #######
 # health items mods
@@ -431,8 +531,8 @@ ragfair_data['dynamic']['offerAdjustment']['priceThreshholdRub'] = 999999
 # 'airFilterUnitFlowRate': 0.004722222222222,
 # larger is better
 # 'gpuBoostRate': 0.041225
-hideout_settings_data['generatorFuelFlowRate'] *= 0.5
-hideout_settings_data['airFilterUnitFlowRate'] *= 0.5
+hideout_settings_data['generatorFuelFlowRate'] = 0.00065972
+hideout_settings_data['airFilterUnitFlowRate'] = 0.002361
 hideout_settings_data['gpuBoostRate'] = 0.041225
 
 # set construction of any hideout areas to 1
@@ -479,16 +579,18 @@ for scav in range(0, len(hideout_scav_case_data)):
 insurance_data['insuranceMultiplier'][prapor_id] = 0.15
 insurance_data['insuranceMultiplier'][therapist_id] = 0.15
 
-insurance_data['returnChancePercent'][prapor_id] = 0.95
-insurance_data['returnChancePercent'][therapist_id] = 0.95
+insurance_data['returnChancePercent'][prapor_id] = 100
+insurance_data['returnChancePercent'][therapist_id] = 100
 insurance_data['runIntervalSeconds'] = 60
 
 prapor_data['insurance']['min_return_hour'] = 0
 prapor_data['insurance']['max_return_hour'] = 0
-prapor_data['insurance']['max_storage_time'] = 666
+prapor_data['insurance']['max_storage_time'] = 6000
 therapist_data['insurance']['min_return_hour'] = 0
 therapist_data['insurance']['max_return_hour'] = 0
-therapist_data['insurance']['max_storage_time'] = 666
+therapist_data['insurance']['max_storage_time'] = 6000
+
+global_data['config']['Insurance']['MaxStorageTimeInHour'] = 600
 
 ####
 # bot name changes
@@ -584,6 +686,19 @@ usec_name_list = ["12YoSoaking","2Dudes1Butt","2DudesCuddling","2DudesSoaking",
 bear_data['firstName'] = bear_name_list
 usec_data['firstName'] = usec_name_list
 
+# weap/armor durability for all non-pmc bots
+for bot in bot_data['durability']:
+    if bot_data['durability'][bot] != 'pmc':
+        # set armor values
+        bot_data['durability'][bot]['armor']['maxDelta'] = 10
+        
+        # set weapon values
+        bot_data['durability'][bot]['weapon']['lowestMax'] = 80
+        bot_data['durability'][bot]['weapon']['minDelta'] = 0
+        bot_data['durability'][bot]['weapon']['maxDelta'] = 20
+        
+global_data['config']['Malfunction']['AllowMalfForBots'] = True
+
 ########
 # map changes
 ########
@@ -605,10 +720,66 @@ for folder in folder_list:
     map_data['GlobalContainerChanceModifier'] *= 2
     map_data['GlobalLootChanceModifier'] *= 2
     
+    # create a list of all spawn points that either pmc or all players can spawn at
+    spawn_list = []
+    for spawn in range(0, len(map_data['SpawnPointParams'])):
+        if map_data['SpawnPointParams'][spawn]['Sides'][0] in ['Pmc', 'All']:
+            spawn_list.append(map_data['SpawnPointParams'][spawn]['Infiltration'])
+    
+    # turn the list into a set to keep only unique values
+    spawn_list = set(spawn_list)
+    
+    # convert it into a comma seperated string
+    spawn_string = ''
+    
+    for spawn in spawn_list:
+        spawn_string += spawn+','
+    
+    # remove the extra comma at the end of the last location
+    spawn_string = spawn_string[0:-1]
+    
+    # set chance of exit to 100 and append all spawn locations as valid
+    # starting points for that exit to appear
     for exits in range(0,len(map_data['exits'])):
         map_data['exits'][exits]['Chance'] = 100
+        map_data['exits'][exits]['EntryPoints'] = spawn_string
         
     save_json(map_data, full_path)
+
+# loot modifiers
+for loot in location_data['looseLootMultiplier']:
+    location_data['looseLootMultiplier'][loot] *= 2
+
+for loot in location_data['staticLootMultiplier']:
+    location_data['staticLootMultiplier'][loot] *= 2
+
+# global loot modifier
+global_data['config']['GlobalLootChanceModifier'] = 0.6
+
+# lower boss spawn rate to 15% where it was greater than 15% before
+for location in location_data['customWaves']['boss']:
+    for spawn in range(0, len(location_data['customWaves']['boss'][location])):
+        if location_data['customWaves']['boss'][location][spawn]['BossChance'] > 15:
+            location_data['customWaves']['boss'][location][spawn]['BossChance'] = 15
+
+# remove requirements to drop armor, have red rebel and paracord on reserve cliff exit
+global_data['config']['RequirementReferences']['Alpinist'] = []
+
+# [{'Count': 1,
+#   'Id': '5c12688486f77426843c7d32',
+#   'RequiredSlot': 'FirstPrimaryWeapon',
+#   'Requirement': 'HasItem',
+#   'RequirementTip': 'EXFIL_NEED_ITEM {0}'},
+#  {'Count': 1,
+#   'Id': '5c0126f40db834002a125382',
+#   'RequiredSlot': 'FirstPrimaryWeapon',
+#   'Requirement': 'HasItem',
+#   'RequirementTip': 'EXFIL_NEED_ITEM {0}'},
+#  {'Count': 0,
+#   'Id': '',
+#   'RequiredSlot': 'ArmorVest',
+#   'Requirement': 'Empty',
+#   'RequirementTip': 'EXFIL_ARMOR_TIP'}]
 
 ###
 # quest changes
@@ -621,9 +792,81 @@ for quest in quest_data:
     except:
         pass
 
+# 4 hour daily quests
+quest_config_data['repeatableQuests'][0]['resetTime'] = 14400
+quest_config_data['repeatableQuests'][0]['numQuests'] = 6
+quest_config_data['repeatableQuests'][0]['rewardScaling']['levels'] = [1, 10, 20, 30]
+quest_config_data['repeatableQuests'][0]['rewardScaling']['experience'] = [4000, 8000, 16000, 32000]
+quest_config_data['repeatableQuests'][0]['rewardScaling']['roubles'] = [12000, 20000, 220000, 550000]
+quest_config_data['repeatableQuests'][0]['rewardScaling']['items'] = [2, 3, 4, 5]
+quest_config_data['repeatableQuests'][0]['rewardScaling']['reputation'] = [0.01, 0.02, 0.03, 0.04]
+quest_config_data['repeatableQuests'][0]['rewardScaling']['rewardSpread'] = 0.1
+
+# set exploration and completion tasks
+quest_config_data['repeatableQuests'][0]['questConfig']['Exploration']['maxExtracts'] = 2
+quest_config_data['repeatableQuests'][0]['questConfig']['Exploration']['specificExits']['probability'] = 0
+quest_config_data['repeatableQuests'][0]['questConfig']['Completion']['maxRequestedAmount'] = 3
+quest_config_data['repeatableQuests'][0]['questConfig']['Completion']['minRequestedBulletAmount'] = 1
+quest_config_data['repeatableQuests'][0]['questConfig']['Completion']['maxRequestedBulletAmount'] = 1
+
+# set elimination tasks for level range 1-15 and 15-100
+quest_config_data['repeatableQuests'][0]['questConfig']['Elimination'][0]['levelRange']['max'] = 15
+quest_config_data['repeatableQuests'][0]['questConfig']['Elimination'][0]['bodyPartProb'] = 0
+quest_config_data['repeatableQuests'][0]['questConfig']['Elimination'][0]['specificLocationProb'] = 0
+quest_config_data['repeatableQuests'][0]['questConfig']['Elimination'][0]['distProb'] = 0
+quest_config_data['repeatableQuests'][0]['questConfig']['Elimination'][0]['minKills'] = 1
+
+quest_config_data['repeatableQuests'][0]['questConfig']['Elimination'][1]['levelRange']['min'] = 15
+quest_config_data['repeatableQuests'][0]['questConfig']['Elimination'][1]['bodyPartProb'] = 0
+quest_config_data['repeatableQuests'][0]['questConfig']['Elimination'][1]['specificLocationProb'] = 0
+quest_config_data['repeatableQuests'][0]['questConfig']['Elimination'][1]['distProb'] = 0
+quest_config_data['repeatableQuests'][0]['questConfig']['Elimination'][1]['minKills'] = 2
+quest_config_data['repeatableQuests'][0]['questConfig']['Elimination'][1]['maxKills'] = 6
+
+# set all boss probabilities to 0
+for key in range(2, 9):
+    quest_config_data['repeatableQuests'][0]['questConfig']['Elimination'][1]['targets'][key]['relativeProbability'] = 0
+
+# 12 hour daily quests
+quest_config_data['repeatableQuests'][1]['resetTime'] = 43200
+quest_config_data['repeatableQuests'][1]['numQuests'] = 3
+quest_config_data['repeatableQuests'][1]['rewardScaling']['levels'] = [1, 10, 20, 30]
+quest_config_data['repeatableQuests'][1]['rewardScaling']['experience'] = [8000, 16000, 32000, 64000]
+quest_config_data['repeatableQuests'][1]['rewardScaling']['roubles'] = [25000, 40000, 450000, 1100000]
+quest_config_data['repeatableQuests'][1]['rewardScaling']['items'] = [3, 4, 5, 6]
+quest_config_data['repeatableQuests'][1]['rewardScaling']['reputation'] = [0.02, 0.03, 0.04, 0.05]
+quest_config_data['repeatableQuests'][1]['rewardScaling']['rewardSpread'] = 0.1
+
+# set exploration and completion tasks
+quest_config_data['repeatableQuests'][1]['questConfig']['Exploration']['maxExtracts'] = 4
+quest_config_data['repeatableQuests'][1]['questConfig']['Exploration']['specificExits']['probability'] = 0
+quest_config_data['repeatableQuests'][1]['questConfig']['Completion']['maxRequestedAmount'] = 5
+quest_config_data['repeatableQuests'][1]['questConfig']['Completion']['minRequestedBulletAmount'] = 1
+quest_config_data['repeatableQuests'][1]['questConfig']['Completion']['maxRequestedBulletAmount'] = 1
+
+# set elimination tasks for level range 1-15 and 15-100
+quest_config_data['repeatableQuests'][1]['questConfig']['Elimination'][0]['levelRange']['max'] = 15
+quest_config_data['repeatableQuests'][1]['questConfig']['Elimination'][0]['bodyPartProb'] = 0
+quest_config_data['repeatableQuests'][1]['questConfig']['Elimination'][0]['specificLocationProb'] = 0
+quest_config_data['repeatableQuests'][1]['questConfig']['Elimination'][0]['distProb'] = 0
+quest_config_data['repeatableQuests'][1]['questConfig']['Elimination'][0]['minKills'] = 5
+
+quest_config_data['repeatableQuests'][1]['questConfig']['Elimination'][1]['levelRange']['min'] = 15
+quest_config_data['repeatableQuests'][1]['questConfig']['Elimination'][1]['bodyPartProb'] = 0
+quest_config_data['repeatableQuests'][1]['questConfig']['Elimination'][1]['specificLocationProb'] = 0
+quest_config_data['repeatableQuests'][1]['questConfig']['Elimination'][1]['distProb'] = 0
+quest_config_data['repeatableQuests'][1]['questConfig']['Elimination'][1]['minKills'] = 5
+quest_config_data['repeatableQuests'][1]['questConfig']['Elimination'][1]['maxKills'] = 10
+
+# set all boss probabilities to 0
+for key in range(2, 9):
+    quest_config_data['repeatableQuests'][1]['questConfig']['Elimination'][1]['targets'][key]['relativeProbability'] = 0
+
+
 ##########
 # save and close files
 ##########
+save_json(bot_data, bot_path)
 save_json(item_data, item_path)
 save_json(quest_data, quest_path)
 save_json(prapor_data, prapor_path)
@@ -631,8 +874,10 @@ save_json(global_data, global_path)
 save_json(bear_data, bear_bot_path)
 save_json(usec_data, usec_bot_path)
 save_json(ragfair_data, ragfair_path)
+save_json(location_data, location_path)
 save_json(therapist_data, therapist_path)
 save_json(insurance_data, insurance_path)
+save_json(quest_config_data, quest_config_path)
 save_json(hideout_areas_data, hideout_areas_path)
 save_json(hideout_workout_data, hideout_workout_path)
 save_json(hideout_settings_data, hideout_settings_path)
