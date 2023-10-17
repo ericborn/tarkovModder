@@ -583,12 +583,69 @@ insurance_data['returnChancePercent'][prapor_id] = 100
 insurance_data['returnChancePercent'][therapist_id] = 100
 insurance_data['runIntervalSeconds'] = 60
 
-prapor_data['insurance']['min_return_hour'] = 0
-prapor_data['insurance']['max_return_hour'] = 0
-prapor_data['insurance']['max_storage_time'] = 6000
-therapist_data['insurance']['min_return_hour'] = 0
-therapist_data['insurance']['max_return_hour'] = 0
-therapist_data['insurance']['max_storage_time'] = 6000
+# gather all trader folders
+trader_list = os.listdir(trader_path)
+trader_list.remove('ragfair')
+
+# iterate through the traders change their nameds
+# try setting their repair quality to 1, instant insurance return time and 
+# longer equipment storage. convert all avatars to .png as some are .jpg
+for trader in trader_list:
+    trader_data = load_json(trader_path+'/'+trader+'/'+base_file_name)
+    
+    # mechanic
+    if trader_data['_id'] == '5a7c2eca46aef81a7ca2145d':
+       trader_data['nickname'] = 'Green Top'
+    
+    # ragman
+    if trader_data['_id'] == '5ac3b934156ae10c4430e83c':
+       trader_data['nickname'] = 'Quiet'
+       
+    # jager
+    if trader_data['_id'] == '5c0647fdd443bc2504c2d371':
+       trader_data['nickname'] = 'Cock Squat'
+       
+    # prapor
+    if trader_data['_id'] == '54cb50c76803fa8b248b4571':
+       trader_data['nickname'] = 'Red Yoga'
+    
+    # therapist
+    if trader_data['_id'] == '54cb57776803fa99248b456e':
+       trader_data['nickname'] = 'Nurse'
+       
+    # skier
+    if trader_data['_id'] == '579dc571d53a0658a154fbec':
+       trader_data['nickname'] = 'Green Pastures'
+       
+    # peacekeeper
+    if trader_data['_id'] == '638f541a29ffd1183d187f57':
+       trader_data['nickname'] = 'Sexy Blue'
+       
+    # fence
+    if trader_data['_id'] == '5935c25fb3acc3127c3d8cd9':
+       trader_data['nickname'] = 'Grey Tats'
+       
+    # lightkeeper
+    if trader_data['_id'] == '58330581ace78e27b8b10cee':
+       trader_data['nickname'] = 'Caged Grey'
+       
+    trader_data['avatar'] = trader_data['avatar'][:-3] + 'png'
+    try:
+        trader_data['repair']['quality'] = 1
+        trader_data['insurance']['min_return_hour'] = 0
+        trader_data['insurance']['max_return_hour'] = 0
+        trader_data['insurance']['max_storage_time'] = 6000
+    except:
+        pass
+
+    save_json(trader_data, trader_path +'/'+ trader +'/'+ base_file_name)
+
+# prapor_data['insurance']['min_return_hour'] = 0
+# prapor_data['insurance']['max_return_hour'] = 0
+# prapor_data['insurance']['max_storage_time'] = 6000
+# therapist_data['insurance']['min_return_hour'] = 0
+# therapist_data['insurance']['max_return_hour'] = 0
+# therapist_data['insurance']['max_storage_time'] = 6000
 
 global_data['config']['Insurance']['MaxStorageTimeInHour'] = 600
 
