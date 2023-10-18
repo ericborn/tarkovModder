@@ -511,8 +511,8 @@ for item in item_data:
 
 ragfair_data['sell']['simulatedSellHours'] = 1
 ragfair_data['sell']['chance']['base'] = 100
-ragfair_data['sell']['chance']['overpriced'] = 3
-ragfair_data['sell']['chance']['underpriced'] = 3
+ragfair_data['sell']['chance']['overpriced'] = 10
+ragfair_data['sell']['chance']['underpriced'] = 10
 ragfair_data['sell']['time']['base'] = 0.1
 ragfair_data['sell']['time']['max'] = 0.1
 
@@ -579,8 +579,8 @@ for scav in range(0, len(hideout_scav_case_data)):
 insurance_data['insuranceMultiplier'][prapor_id] = 0.15
 insurance_data['insuranceMultiplier'][therapist_id] = 0.15
 
-insurance_data['returnChancePercent'][prapor_id] = 100
-insurance_data['returnChancePercent'][therapist_id] = 100
+insurance_data['returnChancePercent'][prapor_id] = 25
+insurance_data['returnChancePercent'][therapist_id] = 25
 insurance_data['runIntervalSeconds'] = 60
 
 # gather all trader folders
