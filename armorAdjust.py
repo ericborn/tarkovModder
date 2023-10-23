@@ -52,6 +52,7 @@ item_path = install_drive + eft_version + 'Aki_Data/Server/database/templates/it
 quest_path = install_drive + eft_version + 'Aki_Data/Server/database/templates/quests.json'
 bear_bot_path = install_drive + eft_version + 'Aki_Data/Server/database/bots/types/bear.json'
 usec_bot_path = install_drive + eft_version + 'Aki_Data/Server/database/bots/types/usec.json'
+locales_path = install_drive + eft_version + 'Aki_Data/Server/database/locales/global/en.json'
 hideout_areas_path = install_drive + eft_version + 'Aki_Data/Server/database/hideout/areas.json'
 hideout_workout_path = install_drive + eft_version + 'Aki_Data/Server/database/hideout/qte.json'
 hideout_settings_path = install_drive + eft_version + 'Aki_Data/Server/database/hideout/settings.json'
@@ -67,6 +68,7 @@ global_data = load_json(global_path)
 bear_data = load_json(bear_bot_path)
 usec_data = load_json(usec_bot_path)
 prapor_data = load_json(prapor_path)
+locales_data = load_json(locales_path)
 ragfair_data = load_json(ragfair_path)
 location_data = load_json(location_path)
 therapist_data = load_json(therapist_path)
@@ -97,6 +99,8 @@ med_kit_ids = ['590c661e86f7741e566b646a', '544fb45d4bdc2dee738b4568',
 other_med_ids = ['5751a25924597722c463c472', '5d02778e86f774203e7dedbe', 
                  '5d02797c86f774203f38e30a', '5e8488fa988a8701445df1e4',
                  '5af0548586f7743a532b7e99', '5af0454c86f7746bf20992e8']
+
+reair_key_ids = ['591094e086f7747caa7bb2ef', '5910968f86f77425cf569c32']
 
 bag_keys = []
 key_keys = []
@@ -229,6 +233,16 @@ global_data['config']['RagFair']['isOnlyFoundInRaidAllowed'] = False
 for money in money_list:
     item_data[money]['_props']['StackMaxSize'] = 999999
 
+# max money in raid
+global_data['config']['RestrictionsInRaid'][0]['MaxInLobby'] = 999999
+global_data['config']['RestrictionsInRaid'][0]['MaxInRaid'] = 999999
+
+global_data['config']['RestrictionsInRaid'][1]['MaxInLobby'] = 999999
+global_data['config']['RestrictionsInRaid'][1]['MaxInRaid'] = 999999
+
+global_data['config']['RestrictionsInRaid'][2]['MaxInLobby'] = 999999
+global_data['config']['RestrictionsInRaid'][2]['MaxInRaid'] = 999999
+
 # expand bags
 for bags in bag_keys:
     item_data[bags]['_props']['Grids'][0]['_props']['cellsH'] += 2
@@ -268,23 +282,25 @@ for key in key_keys:
 
 # stamina changes
 # default {'x': 0.17, 'y': 0.7, 'z': 0}
-global_data['config']['Stamina']['CrouchConsumption']['x'] = 0.1
-global_data['config']['Stamina']['CrouchConsumption']['y'] = 0.3
+global_data['config']['Stamina']['CrouchConsumption']['x'] = 0.0
+global_data['config']['Stamina']['CrouchConsumption']['y'] = 0.0
+
+global_data['config']['Stamina']['JumpConsumption'] = 7
 
 global_data['config']['Stamina']['FallDamageMultiplier'] *= 0.25
 
 # default {'x': -3, 'y': -2, 'z': 0}
-global_data['config']['Stamina']['OverweightConsumptionByPose']['x'] *= 0.5
-global_data['config']['Stamina']['OverweightConsumptionByPose']['y'] *= 0.5
+global_data['config']['Stamina']['OverweightConsumptionByPose']['x'] = 0
+global_data['config']['Stamina']['OverweightConsumptionByPose']['y'] = 0
 
-global_data['config']['Stamina']['ProneConsumption'] *= 0.5
+global_data['config']['Stamina']['ProneConsumption'] = 0
 
-global_data['config']['Stamina']['SitToStandConsumption'] *= 0.5
+global_data['config']['Stamina']['SitToStandConsumption'] = 0
 global_data['config']['Stamina']['SprintDrainRate'] *= 0.5
 global_data['config']['Stamina']['SprintOverweightLimits']['x'] *= 1.25
 global_data['config']['Stamina']['SprintOverweightLimits']['y'] *= 1.25
-global_data['config']['Stamina']['StandupConsumption']['x'] *= 0.5
-global_data['config']['Stamina']['StandupConsumption']['y'] *= 0.5
+global_data['config']['Stamina']['StandupConsumption']['x'] = 0
+global_data['config']['Stamina']['StandupConsumption']['y'] = 0
 
 # inertia changes
 inertia_multi = 0.6
@@ -432,6 +448,11 @@ global_data['config']['SkillsSettings']['Health']['SkillProgress'] = 1.25
 global_data['config']['RepairSettings']['durabilityPointCostArmor'] = 0.01
 global_data['config']['RepairSettings']['durabilityPointdurabilityPointCostGunsCostArmor'] = 0.01
 
+# increase repair kit max duability and reduce durability loss on items
+for key in reair_key_ids:
+    item_data[key]['MaxRepairResource'] = 10000
+    item_data[key]['RepairQuality'] = 0
+
 for material in global_data['config']['ArmorMaterials']:
     global_data['config']['ArmorMaterials'][material]['MinRepairDegradation'] = 0.001
     global_data['config']['ArmorMaterials'][material]['MinRepairKitDegradation'] = 0.001
@@ -504,10 +525,12 @@ for key in all_keys:
         pass
 ####
 # buy/sell all items on flea
+# make all items be discardable without deleting the item during raid
 ####
 for item in item_data:
     item_data[item]['_props']['CanSellOnRagfair'] = True
     item_data[item]['_props']['CanRequireOnRagfair'] = True
+    item_data[item]['_props']['DiscardLimit'] = -1
 
 ragfair_data['sell']['simulatedSellHours'] = 1
 ragfair_data['sell']['chance']['base'] = 100
@@ -515,6 +538,9 @@ ragfair_data['sell']['chance']['overpriced'] = 10
 ragfair_data['sell']['chance']['underpriced'] = 10
 ragfair_data['sell']['time']['base'] = 0.1
 ragfair_data['sell']['time']['max'] = 0.1
+
+# disable packs of items which messes up average price display in flea
+ragfair_data['dynamic']['pack']['enable'] = False
 
 ragfair_data['dynamic']['purchasesAreFoundInRaid'] = True
 ragfair_data['dynamic']['blacklist']['enableBsgList'] = False
@@ -579,8 +605,8 @@ for scav in range(0, len(hideout_scav_case_data)):
 insurance_data['insuranceMultiplier'][prapor_id] = 0.15
 insurance_data['insuranceMultiplier'][therapist_id] = 0.15
 
-insurance_data['returnChancePercent'][prapor_id] = 25
-insurance_data['returnChancePercent'][therapist_id] = 25
+insurance_data['returnChancePercent'][prapor_id] = 75
+insurance_data['returnChancePercent'][therapist_id] = 75
 insurance_data['runIntervalSeconds'] = 60
 
 # gather all trader folders
@@ -593,45 +619,46 @@ trader_list.remove('ragfair')
 for trader in trader_list:
     trader_data = load_json(trader_path+'/'+trader+'/'+base_file_name)
     
-    # mechanic
+    # Mechanic
     if trader_data['_id'] == '5a7c2eca46aef81a7ca2145d':
        trader_data['nickname'] = 'Green Top'
     
-    # ragman
+    # Ragman
     if trader_data['_id'] == '5ac3b934156ae10c4430e83c':
        trader_data['nickname'] = 'Quiet'
        
-    # jager
+    # Jager
     if trader_data['_id'] == '5c0647fdd443bc2504c2d371':
        trader_data['nickname'] = 'Cock Squat'
        
-    # prapor
+    # Prapor
     if trader_data['_id'] == '54cb50c76803fa8b248b4571':
        trader_data['nickname'] = 'Red Yoga'
     
-    # therapist
+    # Therapist
     if trader_data['_id'] == '54cb57776803fa99248b456e':
        trader_data['nickname'] = 'Nurse'
        
-    # skier
+    # Skier
     if trader_data['_id'] == '579dc571d53a0658a154fbec':
        trader_data['nickname'] = 'Green Pastures'
        
-    # peacekeeper
+    # Peacekeeper
     if trader_data['_id'] == '638f541a29ffd1183d187f57':
        trader_data['nickname'] = 'Sexy Blue'
        
-    # fence
+    # Fence
     if trader_data['_id'] == '5935c25fb3acc3127c3d8cd9':
        trader_data['nickname'] = 'Grey Tats'
        
-    # lightkeeper
+    # Lightkeeper
     if trader_data['_id'] == '58330581ace78e27b8b10cee':
        trader_data['nickname'] = 'Caged Grey'
        
     trader_data['avatar'] = trader_data['avatar'][:-3] + 'png'
     try:
-        trader_data['repair']['quality'] = 1
+        # 0 quality makes the reapir take no max durability, smaller is better
+        trader_data['repair']['quality'] = 0
         trader_data['insurance']['min_return_hour'] = 0
         trader_data['insurance']['max_return_hour'] = 0
         trader_data['insurance']['max_storage_time'] = 6000
@@ -639,6 +666,30 @@ for trader in trader_list:
         pass
 
     save_json(trader_data, trader_path +'/'+ trader +'/'+ base_file_name)
+
+# locales_data.update({'54cb50c76803fa8b248b4571 Nickname': 'Red Yoga'})
+# locales_data.get('54cb50c76803fa8b248b4571 Nickname')
+
+# grab all key and values from the locales json
+key_list = list(locales_data.keys())
+value_list = list(locales_data.values())
+new_value_list = []
+
+# find and replace all values related to the trader name
+for word in value_list:
+    new_value_list.append(word.replace('Mechanic', 'Green Top').replace('Ragman', 'Nurse')
+                    .replace('Jager', 'Cock Squat').replace('Prapor', 'Red Yoga')
+                    .replace('Therapist', 'Nurse').replace('Skier', 'Green Pastures')
+                    .replace('Peacekeeper', 'Sexy Blue').replace('Lightkeeper', 'Caged Grey')
+                    .replace('Fence', 'Grey Tats'))
+
+# build a new dict with the changed data
+locales_data = {}
+for key in key_list:
+    for value in new_value_list:
+        locales_data[key] = value
+        new_value_list.remove(value)
+        break
 
 # prapor_data['insurance']['min_return_hour'] = 0
 # prapor_data['insurance']['max_return_hour'] = 0
@@ -919,7 +970,6 @@ quest_config_data['repeatableQuests'][1]['questConfig']['Elimination'][1]['maxKi
 for key in range(2, 9):
     quest_config_data['repeatableQuests'][1]['questConfig']['Elimination'][1]['targets'][key]['relativeProbability'] = 0
 
-
 ##########
 # save and close files
 ##########
@@ -931,6 +981,7 @@ save_json(global_data, global_path)
 save_json(bear_data, bear_bot_path)
 save_json(usec_data, usec_bot_path)
 save_json(ragfair_data, ragfair_path)
+save_json(locales_data, locales_path)
 save_json(location_data, location_path)
 save_json(therapist_data, therapist_path)
 save_json(insurance_data, insurance_path)
