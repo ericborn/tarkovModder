@@ -63,29 +63,31 @@ player_outfile.close()
 #############
 # mod existing profiles
 #############
-# player_profile_path = install_drive + eft_version + 'user/profiles/'
-# profile_list = os.listdir(player_profile_path)
+player_profile_path = install_drive + eft_version + 'user/profiles/'
+profile_list = os.listdir(player_profile_path)
 
-# for profiles in profile_list:
-#     profile = open(player_profile_path+profiles, 'r', encoding='utf8')
-#     profile_data = json.loads(profile.read())
+player_health_mod = 3
+
+for profiles in profile_list:
+    profile = open(player_profile_path+profiles, 'r', encoding='utf8')
+    profile_data = json.loads(profile.read())
     
-#     # buff current player map hp
-#     # for body_part in profile_data['characters']['pmc']['Health']['BodyParts']:
-#     #     profile_data['characters']['pmc']['Health']['BodyParts'][body_part]['Health']['Current'] *= player_health_mod
-#     #     profile_data['characters']['pmc']['Health']['BodyParts'][body_part]['Health']['Maximum'] *= player_health_mod
+    # buff current player max hp
+    for body_part in profile_data['characters']['pmc']['Health']['BodyParts']:
+        profile_data['characters']['pmc']['Health']['BodyParts'][body_part]['Health']['Current'] *= player_health_mod
+        profile_data['characters']['pmc']['Health']['BodyParts'][body_part]['Health']['Maximum'] *= player_health_mod
     
-#     # set all money stacks to 999999
-#     for item in range(0, len(profile_data['characters']['pmc']['Inventory']['items'])):
-#         if profile_data['characters']['pmc']['Inventory']['items'][item]['_tpl'] in money_list:
-#             profile_data['characters']['pmc']['Inventory']['items'][item]['upd'] = {"StackObjectsCount": 999999, "SpawnedInSession": False}
+    # set all money stacks to 999999
+    for item in range(0, len(profile_data['characters']['pmc']['Inventory']['items'])):
+        if profile_data['characters']['pmc']['Inventory']['items'][item]['_tpl'] in money_list:
+            profile_data['characters']['pmc']['Inventory']['items'][item]['upd'] = {"StackObjectsCount": 999999, "SpawnedInSession": False}
             
             
-#     json_obj = json.dumps(profile_data, indent=4)
+    json_obj = json.dumps(profile_data, indent=4)
     
-#     with open(player_profile_path+profiles, 'w') as outfile:
-#         outfile.write(json_obj)
+    with open(player_profile_path+profiles, 'w') as outfile:
+        outfile.write(json_obj)
         
-#     profile.close()  
-#     outfile.close()
+    profile.close()  
+    outfile.close()
 
